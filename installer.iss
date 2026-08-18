@@ -1,0 +1,35 @@
+[Setup]
+AppId={{AR-CHATBOT-2026-0001}
+AppName=AR_ChatBot
+AppVersion=1.0.0
+AppPublisher=AR_ChatBot
+DefaultDirName={localappdata}\AR_ChatBot
+DefaultGroupName=AR_ChatBot
+OutputDir=D:\AR_ChatBot\dist
+OutputBaseFilename=AR_ChatBot_Setup
+Compression=lzma2
+SolidCompression=yes
+PrivilegesRequired=lowest
+DisableProgramGroupPage=yes
+DisableDirPage=no
+UninstallDisplayIcon={app}\backend\server.exe
+WizardStyle=modern
+
+[Files]
+Source: "D:\AR_ChatBot\backend\server.js"; DestDir: "{app}\backend"; Flags: ignoreversion
+Source: "D:\AR_ChatBot\backend\src\*"; DestDir: "{app}\backend\src"; Flags: recursesubdirs
+Source: "D:\AR_ChatBot\backend\data\config.json"; DestDir: "{app}\backend\data"; Flags: ignoreversion
+Source: "D:\AR_ChatBot\backend\package.json"; DestDir: "{app}\backend"; Flags: ignoreversion
+Source: "D:\AR_ChatBot\app\build\web\*"; DestDir: "{app}\web"; Flags: recursesubdirs
+Source: "D:\AR_ChatBot\widget\*"; DestDir: "{app}\widget"; Flags: recursesubdirs
+Source: "D:\AR_ChatBot\start.bat"; DestDir: "{app}"; Flags: ignoreversion
+
+[Icons]
+Name: "{group}\AR_ChatBot"; Filename: "{app}\start.bat"; WorkingDir: "{app}"
+Name: "{group}\Uninstall AR_ChatBot"; Filename: "{uninstallexe}"
+Name: "{userdesktop}\AR_ChatBot"; Filename: "{app}\start.bat"; WorkingDir: "{app}"; Tasks: desktopicon
+
+[Tasks]
+Name: "desktopicon"; Description: "Create desktop shortcut"; GroupDescription: "Additional icons:"
+
+[Run]
