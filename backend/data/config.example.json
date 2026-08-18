@@ -1,0 +1,18 @@
+{
+  "apiKey": "CHANGE_ME",
+  "companyName": "Your Company",
+  "personality": "Friendly and professional",
+  "customInstructions": "",
+  "defaultLanguage": "ar",
+  "aiProvider": "groq",
+  "aiModel": "allam-2-7b",
+  "groqApiKey": "gsk_YOUR_GROQ_API_KEY_HERE",
+  "openaiApiKey": "",
+  "temperature": 0.7,
+  "businessHours": {
+    "enabled": false,
+    "startHour": 9,
+    "endHour": 17,
+    "timezone": "Africa/Cairo"
+  }
+}

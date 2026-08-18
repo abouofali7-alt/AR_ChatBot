@@ -1,0 +1,13 @@
+node_modules/
+app/build/
+app/.dart_tool/
+app/.packages
+backend/data/config.json
+backend/data/sessions.json
+backend/data/ai.log
+backend/data/chats.json
+backend/session/
+dist/
+tmp/
+*.log
+.DS_Store
