@@ -1,6 +1,0 @@
-tree d6ee735f047081d2b50c4db9941dd2d115c562fa
-parent 971d2a4e0d80a3ebf9b7a0d7ccca82aba7517573
-author AR_ChatBot <ar_chatbot@dev.local> 1787024664 +0300
-committer AR_ChatBot <ar_chatbot@dev.local> 1787024664 +0300
-
-Fix: pass Gemini config to all endpoints (webhook, chat, stream)
