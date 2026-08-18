@@ -52,6 +52,14 @@ if (!fs.existsSync(path.join(DATA_DIR, 'config.json')) || !loadJSON('config.json
   saveJSON('config.json', envConfig);
 }
 
+if (process.env.GROQ_API_KEY) {
+  const cfg = loadJSON('config.json');
+  if (!cfg.groqApiKey) {
+    cfg.groqApiKey = process.env.GROQ_API_KEY;
+    saveJSON('config.json', cfg);
+  }
+}
+
 function requireAuth(req, res, next) {
   const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
   const config = loadJSON('config.json');
