@@ -35,6 +35,23 @@ function saveJSON(file, data) {
   fs.writeFileSync(path.join(DATA_DIR, file), JSON.stringify(data, null, 2), 'utf8');
 }
 
+if (!fs.existsSync(path.join(DATA_DIR, 'config.json')) || !loadJSON('config.json').apiKey) {
+  const envConfig = {
+    apiKey: process.env.AR_CHATBOT_KEY || 'ar_chatbot_2026',
+    companyName: process.env.COMPANY_NAME || 'AR_ChatBot',
+    personality: 'Friendly and professional',
+    customInstructions: '',
+    defaultLanguage: 'ar',
+    aiProvider: 'groq',
+    aiModel: 'allam-2-7b',
+    groqApiKey: process.env.GROQ_API_KEY || '',
+    openaiApiKey: '',
+    temperature: 0.7,
+    businessHours: { enabled: false, startHour: 9, endHour: 17, timezone: 'Africa/Cairo' }
+  };
+  saveJSON('config.json', envConfig);
+}
+
 function requireAuth(req, res, next) {
   const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
   const config = loadJSON('config.json');
