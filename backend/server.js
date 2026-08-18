@@ -69,6 +69,65 @@ function requireAuth(req, res, next) {
 
 app.get('/healthz', (req, res) => res.json({ ok: true, version: '1.0.0' }));
 
+app.get('/', (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AR_ChatBot - AI Customer Service</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.hero{text-align:center;max-width:700px}
+h1{font-size:2.5rem;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.sub{font-size:1.1rem;color:#94a3b8;margin-bottom:40px;line-height:1.6}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;width:100%;max-width:700px;margin-bottom:40px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;text-align:center;transition:transform .2s}
+.card:hover{transform:translateY(-4px);border-color:#3b82f6}
+.card h3{margin:8px 0 4px;color:#3b82f6}
+.card p{font-size:.85rem;color:#94a3b8}
+.badge{display:inline-block;background:#10b981;color:#000;padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:600;margin-bottom:20px}
+.api-box{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;max-width:500px;width:100%;text-align:left}
+.api-box h3{color:#f59e0b;margin-bottom:12px;font-size:.9rem}
+code{background:#0f172a;padding:2px 6px;border-radius:4px;font-size:.8rem;color:#10b981}
+pre{background:#0f172a;padding:12px;border-radius:8px;overflow-x:auto;font-size:.75rem;color:#94a3b8;margin-top:8px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="hero">
+<div class="badge">Online & Active</div>
+<h1>AR_ChatBot</h1>
+<p class="sub">Open-source AI Customer Service Platform<br>Multi-language \u00b7 Multi-channel \u00b7 Powered by Groq AI</p>
+</div>
+<div class="cards">
+<div class="card"><h3>8 Languages</h3><p>AR, EN, FR, TR, UR, HI, ES, DE</p></div>
+<div class="card"><h3>4 Channels</h3><p>WhatsApp, Telegram, Web Widget, REST API</p></div>
+<div class="card"><h3>AI Powered</h3><p>Groq + Template hybrid engine</p></div>
+<div class="card"><h3>Free Hosting</h3><p>Deployed on Railway</p></div>
+</div>
+<div class="api-box">
+<h3>Quick Test (Webhook)</h3>
+<pre>POST /api/webhook
+Content-Type: application/json
+
+{
+  "message": "Hello",
+  "language": "en"
+}</pre>
+<h3 style="margin-top:16px">Authenticated API</h3>
+<pre>POST /api/chat
+Authorization: Bearer &lt;API_KEY&gt;
+Content-Type: application/json
+
+{
+  "message": "Hello",
+  "sessionId": "optional"
+}</pre>
+</div>
+</body>
+</html>`);
+});
+
 app.post('/api/chat', requireAuth, async (req, res) => {
   try {
     const { message, sessionId, language, context } = req.body;
