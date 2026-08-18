@@ -2,11 +2,11 @@ let whatsapp = null;
 let telegram = null;
 
 function getWhatsApp() {
-  if (!whatsapp) whatsapp = require('./whatsapp');
+  if (!whatsapp) whatsapp = require('./channels/whatsapp');
   return whatsapp;
 }
 function getTelegram() {
-  if (!telegram) telegram = require('./telegram');
+  if (!telegram) telegram = require('./channels/telegram');
   return telegram;
 }
 
@@ -65,7 +65,7 @@ function init(app, io, loadJSON, saveJSON) {
     try {
       const { message, sessionId, language } = req.body;
       if (!message) return res.status(400).json({ error: 'message_required' });
-      const { generateReply } = require('../ai');
+      const { generateReply } = require('./ai');
       const config = loadJSON('config.json', {});
       const sessions = loadJSON('sessions.json');
       const sid = sessionId || require('uuid').v4();
