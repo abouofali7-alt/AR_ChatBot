@@ -168,33 +168,62 @@ Rules:
 - Never truncate responses prematurely
 - Reply in the same language the user used.`;
 
-  try {
-    let rawReply;
-    const provider = opts.provider || 'groq';
-    if (provider === 'gemini' && opts.geminiApiKey) {
-      rawReply = await callGemini(
-        messages.slice(-8),
-        systemPrompt,
-        opts.geminiApiKey,
-        opts.model || 'gemini-2.0-flash',
-        opts.temperature || 0.7
-      );
-    } else {
-      rawReply = await callGroq(
-        messages.slice(-8),
-        systemPrompt,
-        opts.apiKey || process.env.GROQ_API_KEY,
-        opts.model || 'allam-2-7b',
-        opts.temperature || 0.7
-      );
-    }
-    const cleaned = cleanReply(rawReply);
-    log(`AI [${lang}/${provider}]: "${cleaned.substring(0, 80)}"`);
-    return cleaned;
-  } catch (e) {
-    log(`AI error: ${e.message}`);
-    return 'Sorry, I\'m having a technical issue. Please try again in a moment.';
+  const provider = opts.provider || 'gemini';
+  const geminiModels = ['gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.6-flash', 'gemini-2.5-flash'];
+
+  async function tryGemini(model) {
+    return await callGemini(
+      messages.slice(-8), systemPrompt, opts.geminiApiKey, model, opts.temperature || 0.7
+    );
   }
+
+  async function tryGroq() {
+    return await callGroq(
+      messages.slice(-8), systemPrompt, opts.apiKey || process.env.GROQ_API_KEY,
+      'allam-2-7b', opts.temperature || 0.7
+    );
+  }
+
+  let rawReply = '';
+
+  if (provider === 'gemini' && opts.geminiApiKey) {
+    const primaryModel = opts.model || geminiModels[0];
+    const models = [primaryModel, ...geminiModels.filter(m => m !== primaryModel)];
+
+    for (const model of models) {
+      try {
+        rawReply = await tryGemini(model);
+        log(`AI [${lang}/gemini/${model}]`);
+        break;
+      } catch (e) {
+        log(`Gemini ${model} failed: ${e.message.substring(0, 100)}`);
+        continue;
+      }
+    }
+
+    if (!rawReply && opts.apiKey) {
+      try {
+        rawReply = await tryGroq();
+        log(`AI [${lang}/groq] (fallback from gemini)`);
+      } catch (e) {
+        log(`Groq fallback also failed: ${e.message.substring(0, 100)}`);
+      }
+    }
+  } else {
+    try {
+      rawReply = await tryGroq();
+      log(`AI [${lang}/groq]`);
+    } catch (e) {
+      log(`Groq failed: ${e.message.substring(0, 100)}`);
+    }
+  }
+
+  if (rawReply) {
+    return cleanReply(rawReply);
+  }
+
+  log(`All providers failed for lang=${lang}`);
+  return 'عذراً، فيه مشكلة مؤقتة. جرب تاني بعد شوية.' + ' / Sorry, there\'s a temporary issue. Please try again shortly.';
 }
 
 module.exports = { generateReply, cleanReply, matchTemplate };
