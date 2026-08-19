@@ -170,6 +170,51 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .user-menu.show{display:block}
 .user-menu button{width:100%;padding:8px 12px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:.8rem;text-align:right;border-radius:4px;transition:background .15s}
 .user-menu button:hover{background:var(--surface2);color:var(--text)}
+
+.cl-page{display:none;flex:1;overflow-y:auto;padding:0;width:100%;max-width:100%;margin:0;flex-direction:column}
+.cl-page.show{display:flex}
+.cl-top{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.cl-top h2{font-size:1.1rem;font-weight:600;margin:0;white-space:nowrap}
+.cl-prompt{flex:1;min-width:200px}
+.cl-prompt textarea{width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.85rem;outline:none;resize:none;min-height:42px;max-height:100px;font-family:inherit;line-height:1.5}
+.cl-prompt textarea:focus{border-color:var(--blue)}
+.cl-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cl-lang{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.82rem;outline:none;cursor:pointer}
+.cl-gen{padding:8px 18px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:opacity .15s}
+.cl-gen:hover{opacity:.85}
+.cl-gen:disabled{opacity:.4;cursor:not-allowed}
+.cl-gen .spinner{width:14px;height:14px;border:2px solid #fff4;border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.cl-gen.loading .spinner{display:block}
+.cl-gen.loading .cl-gen-text{display:none}
+.cl-body{flex:1;display:flex;overflow:hidden;min-height:0}
+.cl-editor{flex:1;display:flex;flex-direction:column;border-left:1px solid var(--border)}
+.cl-editor-head{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#16162a;border-bottom:1px solid #2a2a3e}
+.cl-editor-head span{font-size:.75rem;color:#888;font-family:monospace}
+.cl-editor-btns{display:flex;gap:6px}
+.cl-editor-btns button{padding:4px 12px;border-radius:5px;border:1px solid #444;background:transparent;color:#aaa;font-size:.72rem;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:5px}
+.cl-editor-btns button:hover{background:#333;color:#fff;border-color:#666}
+.cl-editor-btns .cl-run{border-color:#19c37d;color:#19c37d}
+.cl-editor-btns .cl-run:hover{background:#19c37d;color:#fff}
+.cl-editor-btns .cl-copied{background:#19c37d;color:#fff;border-color:#19c37d}
+.cl-code{flex:1;width:100%;padding:14px;border:none;background:#1a1a2e;color:#e0e0e0;font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-size:.82rem;line-height:1.6;resize:none;outline:none;tab-size:2;white-space:pre;overflow:auto}
+.cl-preview{flex:1;display:flex;flex-direction:column;border-left:1px solid var(--border);min-width:0}
+.cl-preview-head{padding:8px 14px;background:#0d0d1a;border-bottom:1px solid #2a2a3e;display:flex;align-items:center;justify-content:space-between}
+.cl-preview-head span{font-size:.75rem;color:#19c37d;font-family:monospace}
+.cl-preview-head button{padding:2px 8px;border-radius:3px;border:1px solid #333;background:transparent;color:#888;font-size:.65rem;cursor:pointer;font-family:inherit}
+.cl-preview-head button:hover{color:#fff;border-color:#555}
+.cl-output{flex:1;background:#0d0d1a;overflow:auto;min-height:0}
+.cl-output iframe{width:100%;height:100%;border:none}
+.cl-terminal{flex:1;padding:12px 16px;font-family:'Cascadia Code','Fira Code',Consolas,monospace;font-size:.8rem;color:#0f0;overflow:auto;white-space:pre-wrap;line-height:1.5;background:#0d0d1a;min-height:0}
+.cl-terminal .prompt{color:#888}
+.cl-terminal .error{color:#ef4444}
+.cl-terminal .info{color:#888}
+.cl-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.85rem;flex-direction:column;gap:8px}
+.cl-empty .ico{font-size:2.5rem;opacity:.3}
+.cl-tabs{display:flex;gap:0;background:#111125;border-bottom:1px solid #2a2a3e}
+.cl-tabs button{padding:8px 16px;border:none;background:transparent;color:#888;font-size:.75rem;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit}
+.cl-tabs button.active{color:#19c37d;border-bottom-color:#19c37d}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:900px){.cl-body{flex-direction:column}.cl-preview{border-left:none;border-top:1px solid var(--border);max-height:40vh}.cl-editor{min-height:40vh}}
 </style>
 </head>
 <body>
@@ -230,6 +275,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
       </div>
     </div>
     <button id="navChat" class="active" onclick="showPage('chat')">&#128172; Chat</button>
+    <button id="navCodelab" onclick="showPage('codelab')">&#128187; Code Lab</button>
     <button id="navSettings" onclick="showPage('settings')">&#9881; Settings</button>
     <button id="navAPI" onclick="showPage('api')">&#128273; API</button>
   </div>
@@ -297,6 +343,53 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
     <div class="api-doc"><h3><span class="m post">POST</span>/api/chat/stream</h3><pre>curl -X POST https://archatbot-production.up.railway.app/api/chat/stream -H "Authorization: Bearer YOUR_KEY" -H "Content-Type: application/json" -d '{"message":"Hello"}'</pre></div>
     <div class="api-doc"><h3><span class="m get">GET</span>/api/conversations</h3><pre>curl https://archatbot-production.up.railway.app/api/conversations -H "Authorization: Bearer YOUR_KEY"</pre></div>
   </div>
+  <div id="codelabPage" class="cl-page">
+    <div class="cl-top">
+      <h2>&#128187; Code Lab</h2>
+      <div class="cl-prompt"><textarea id="clPrompt" placeholder="Describe the code you want... (e.g. 'Build a todo app in React', 'Python fibonacci with memoization', 'Login form with HTML/CSS')" rows="1"></textarea></div>
+      <div class="cl-controls">
+        <select class="cl-lang" id="clLang">
+          <option value="auto">Auto Detect</option>
+          <option value="python">Python</option>
+          <option value="javascript">JavaScript</option>
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+          <option value="typescript">TypeScript</option>
+          <option value="java">Java</option>
+          <option value="csharp">C#</option>
+          <option value="cpp">C++</option>
+          <option value="go">Go</option>
+          <option value="rust">Rust</option>
+          <option value="sql">SQL</option>
+          <option value="bash">Bash</option>
+          <option value="json">JSON</option>
+        </select>
+        <button class="cl-gen" id="clGenBtn" onclick="clGenerate()"><div class="spinner"></div><span class="cl-gen-text">&#9654; Generate</span></button>
+      </div>
+    </div>
+    <div class="cl-body">
+      <div class="cl-editor">
+        <div class="cl-editor-head">
+          <span id="clLangLabel">code</span>
+          <div class="cl-editor-btns">
+            <button onclick="clCopy()" id="clCopyBtn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button>
+            <button class="cl-run" onclick="clRun()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> Run</button>
+          </div>
+        </div>
+        <textarea class="cl-code" id="clEditor" placeholder="// Generated code will appear here...
+// You can also edit it manually before running." spellcheck="false"></textarea>
+      </div>
+      <div class="cl-preview">
+        <div class="cl-tabs">
+          <button class="active" onclick="clShowTab('output',this)">Output</button>
+          <button onclick="clShowTab('terminal',this)">Terminal</button>
+        </div>
+        <div class="cl-preview-head"><span id="clStatus">Ready</span><button onclick="clClearOutput()">Clear</button></div>
+        <div class="cl-output" id="clOutput"><div class="cl-empty"><div class="ico">&#128187;</div>Click Generate or Run to see output</div></div>
+        <div class="cl-terminal" id="clTerminal" style="display:none"></div>
+      </div>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -329,8 +422,10 @@ _renderer.code=function(code,lang){
 marked.use({renderer:_renderer,breaks:true,gfm:true});
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed')}
-function showPage(p){document.querySelectorAll('.page').forEach(e=>e.classList.remove('show'));document.querySelectorAll('.sidebar-foot button').forEach(b=>b.classList.remove('active'));const ia=document.getElementById('inputArea'),ca=document.getElementById('chatPage');
-if(p==='chat'){ia.style.display='block';ca.style.display='flex';document.getElementById('navChat').classList.add('active');document.getElementById('chatPage').style.display='flex'}else{ia.style.display='none';ca.style.display='none';document.getElementById(p+'Page').classList.add('show');document.getElementById('nav'+p.charAt(0).toUpperCase()+p.slice(1)).classList.add('active');if(p==='settings')loadSettings();if(p==='api')loadAPIPage()}}
+function showPage(p){document.querySelectorAll('.page,.cl-page').forEach(e=>e.classList.remove('show'));document.querySelectorAll('.sidebar-foot button').forEach(b=>b.classList.remove('active'));const ia=document.getElementById('inputArea'),ca=document.getElementById('chatPage');
+if(p==='chat'){ia.style.display='block';ca.style.display='flex';document.getElementById('navChat').classList.add('active');document.getElementById('chatPage').style.display='flex'}
+else if(p==='codelab'){ia.style.display='none';ca.style.display='none';document.getElementById('codelabPage').classList.add('show');document.getElementById('navCodelab').classList.add('active')}
+else{ia.style.display='none';ca.style.display='none';document.getElementById(p+'Page').classList.add('show');const navEl=document.getElementById('nav'+p.charAt(0).toUpperCase()+p.slice(1));if(navEl)navEl.classList.add('active');if(p==='settings')loadSettings();if(p==='api')loadAPIPage()}}
 
 async function loadConversations(){const l=await api('/api/conversations');if(!l)return;document.getElementById('convoList').innerHTML=l.map(c=>`<div class="convo ${currentConvo===c.id?'active':''}" onclick="openConvo('${c.id}')"><span>${esc(c.title)}</span><span class="del" onclick="event.stopPropagation();delConvo('${c.id}')">&#10005;</span></div>`).join('')}
 async function newChat(){const r=await api('/api/conversations','POST',{title:'New Chat'});if(r){currentConvo=r.id;document.getElementById('messages').innerHTML='';document.getElementById('welcomeScreen').style.display='flex';loadConversations()}}
@@ -371,6 +466,70 @@ async function toggleKey(id){await api('/api/keys/'+id+'/toggle','POST');loadAPI
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2500)}
 document.getElementById('msgInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg()}});
 document.getElementById('msgInput').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,140)+'px'});
+
+let clGenerating=false;
+function clShowTab(tab,btn){document.querySelectorAll('.cl-tabs button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('clOutput').style.display=tab==='output'?'block':'none';document.getElementById('clTerminal').style.display=tab==='terminal'?'block':'none'}
+function clClearOutput(){document.getElementById('clOutput').innerHTML='<div class="cl-empty"><div class="ico">&#128187;</div>Click Generate or Run to see output</div>';document.getElementById('clTerminal').innerHTML='';document.getElementById('clStatus').textContent='Ready'}
+function clCopy(){const code=document.getElementById('clEditor').value;if(!code)return;navigator.clipboard.writeText(code).then(()=>{const b=document.getElementById('clCopyBtn');b.classList.add('cl-copied');b.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';setTimeout(()=>{b.classList.remove('cl-copied');b.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy'},1500)})}
+function clDetectLang(code){if(/def\s+\w+|import\s+\w+|from\s+\w+\s+import/.test(code))return'python';if(/(?:function|const|let|var|=>|async|await|document\.|window\.)/.test(code))return'javascript';if(/<!DOCTYPE|<html|<head|<body|<div|<span|<script|<style/.test(code))return'html';if(/\{[\s\S]*:\s*[\d#"']/.test(code)&&/[\w-]+\s*:\s*/.test(code))return'css';if(/SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|FROM\s+\w+/i.test(code))return'sql';if(/#include|using\s+namespace|int\s+main/.test(code))return'cpp';if(/package\s+\w+|func\s+\w+|public\s+class/.test(code))return'java';return'code'}
+
+async function clGenerate(){
+  const prompt=document.getElementById('clPrompt').value.trim();
+  if(!prompt||clGenerating)return;
+  const lang=document.getElementById('clLang').value;
+  const btn=document.getElementById('clGenBtn');
+  const editor=document.getElementById('clEditor');
+  const status=document.getElementById('clStatus');
+  clGenerating=true;btn.classList.add('loading');btn.disabled=true;
+  editor.value='';status.textContent='Generating...';
+  try{
+    const resp=await fetch(API+'/api/code/generate',{method:'POST',headers:H(),body:JSON.stringify({prompt,language:lang})});
+    const reader=resp.body.getReader();const dec=new TextDecoder();let full='';let buf='';
+    while(true){const{done,value}=await reader.read();if(done)break;buf+=dec.decode(value,{stream:true});const lines=buf.split('\n');buf=lines.pop();for(const line of lines){if(!line.startsWith('data: '))continue;try{const d=JSON.parse(line.slice(6));if(d.error){editor.value='Error: '+d.error;continue}if(d.token){full+=d.token;const cleaned=full.replace(/```[\w]*\n?/g,'').replace(/```$/g,'').trim();editor.value=cleaned}}catch{}}}
+    const detected=clDetectLang(editor.value);
+    document.getElementById('clLangLabel').textContent=detected;
+    status.textContent='Generated '+detected.toUpperCase();
+  }catch(e){editor.value='Error: '+e.message;status.textContent='Error'}
+  clGenerating=false;btn.classList.remove('loading');btn.disabled=false;
+}
+
+function clRun(){
+  const code=document.getElementById('clEditor').value.trim();
+  if(!code)return;
+  const output=document.getElementById('clOutput');
+  const terminal=document.getElementById('clTerminal');
+  const lang=clDetectLang(code);
+  document.getElementById('clStatus').textContent='Running '+lang.toUpperCase()+'...';
+  output.innerHTML='';terminal.innerHTML='';
+  document.querySelectorAll('.cl-tabs button')[0].click();
+  if(['javascript','js','json'].includes(lang)){
+    try{const logs=[];const fakeConsole={log:(...a)=>logs.push(a.map(x=>typeof x==='object'?JSON.stringify(x,null,2):String(x)).join(' ')),error:(...a)=>logs.push('<span class="error">'+a.map(String).join(' ')+'</span>'),warn:(...a)=>logs.push('<span class="info">'+a.map(String).join(' ')+'</span>'),clear:()=>logs.length=0};
+    const fn=new Function('console',code);fn(fakeConsole);
+    terminal.innerHTML=logs.length?'<span class="prompt">Output:</span>\n'+logs.join('\n'):'<span class="prompt">Output:</span>\n<span class="info">(no output)</span>';
+    document.querySelectorAll('.cl-tabs button')[1].click();
+    document.getElementById('clStatus').textContent='Done - '+lang.toUpperCase();
+    }catch(e){terminal.innerHTML='<span class="error">Error: '+e.message+'</span>';document.querySelectorAll('.cl-tabs button')[1].click();document.getElementById('clStatus').textContent='Error'}
+  }else if(['html'].includes(lang)){
+    const iframe=document.createElement('iframe');iframe.style.cssText='width:100%;height:100%;border:none';iframe.sandbox='allow-scripts';output.innerHTML='';output.appendChild(iframe);iframe.srcdoc=code;
+    document.getElementById('clStatus').textContent='Running '+lang.toUpperCase()+' - Live Preview';
+  }else if(['css'].includes(lang)){
+    const html='<!DOCTYPE html><html><head><style>'+code+'</style></head><body><div style="padding:20px;font-family:sans-serif"><h1>Hello World</h1><p>This is a paragraph.</p><button>Click Me</button><input placeholder="Type here..." style="margin:10px;padding:8px"><ul><li>Item 1</li><li>Item 2</li></ul></div></body></html>';
+    const iframe=document.createElement('iframe');iframe.style.cssText='width:100%;height:100%;border:none';iframe.sandbox='allow-scripts';output.innerHTML='';output.appendChild(iframe);iframe.srcdoc=html;
+    document.getElementById('clStatus').textContent='Running CSS - Live Preview';
+  }else if(['python','py'].includes(lang)){
+    terminal.innerHTML='<span class="prompt">$ python script.py</span>\n\n<span class="info">Python execution requires a backend runtime.</span>\n<span class="error">To run Python code:\n  1. Copy the code (use Copy button)\n  2. Install Python from python.org\n  3. Save as script.py and run:\n     python script.py</span>\n\n<span class="prompt">$ pip install pyodide</span>\n<span class="info">Tip: Browser-based Python coming soon via Pyodide.</span>';
+    document.querySelectorAll('.cl-tabs button')[1].click();
+    document.getElementById('clStatus').textContent='Python - Copy & run locally';
+  }else{
+    terminal.innerHTML='<span class="prompt">$ Run: '+lang+'</span>\n<span class="info">Execution not available for '+lang+' yet.\nCopy the code and run it in your local environment.</span>';
+    document.querySelectorAll('.cl-tabs button')[1].click();
+    document.getElementById('clStatus').textContent=lang+' - Copy & run locally';
+  }
+}
+
+document.getElementById('clPrompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();clGenerate()}});
+document.getElementById('clPrompt').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'});
+document.getElementById('clEditor').addEventListener('keydown',function(e){if(e.key==='Tab'){e.preventDefault();const s=this.selectionStart,en=this.selectionEnd;this.value=this.value.substring(0,s)+'  '+this.value.substring(en);this.selectionStart=this.selectionEnd=s+2}});
 
 (async function init(){if(token){const me=await api('/api/auth/me');if(me){currentUser=me;showApp();return}}doLogout()})();
 </script>

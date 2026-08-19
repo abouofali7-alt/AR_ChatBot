@@ -223,6 +223,50 @@ app.post('/api/chat/stream', auth.requireAuth, async (req, res) => {
   }
 });
 
+app.post('/api/code/generate', auth.requireAuth, async (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  try {
+    const { prompt, language } = req.body;
+    if (!prompt) { res.write(`data: ${JSON.stringify({error:'prompt_required'})}\n\n`); res.end(); return; }
+
+    const config = loadJSON('config.json');
+    const codePrompt = `You are an expert coding assistant. Generate ONLY the code for the following request. Language: ${language || 'auto'}.\n\nIMPORTANT RULES:\n- Output ONLY the code inside a single markdown code block with the correct language tag\n- No explanations, no greetings, no extra text before or after the code block\n- If the request needs multiple files, separate them with clear comments\n- Write clean, well-commented code\n\nRequest: ${prompt}`;
+
+    const fakeRes = {
+      write: (data) => {
+        const parsed = JSON.parse(data.replace('data: ', '').replace('\n\n', ''));
+        if (parsed.token) res.write(`data: ${JSON.stringify(parsed)}\n\n`);
+      },
+      end: () => res.end(),
+    };
+
+    const reply = await ai.generateReply([{ role: 'user', content: codePrompt }], {
+      language: 'en',
+      apiKey: config.groqApiKey || '',
+      geminiApiKey: config.geminiApiKey || '',
+      provider: config.aiProvider || 'gemini',
+      model: config.aiModel || 'gemini-3.5-flash',
+      temperature: 0.3,
+      personality: 'Expert coder who outputs only code.',
+      company: '',
+      customInstructions: 'Output ONLY code. No explanations. No greetings. Just the code in a markdown code block.',
+    });
+
+    const chunkSize = 8;
+    for (let i = 0; i < reply.length; i += chunkSize) {
+      res.write(`data: ${JSON.stringify({token: reply.substring(i, i + chunkSize), done:false})}\n\n`);
+    }
+    res.write(`data: ${JSON.stringify({token:'', done:true})}\n\n`);
+    res.end();
+  } catch (e) {
+    res.write(`data: ${JSON.stringify({error: e.message})}\n\n`);
+    res.end();
+  }
+});
+
 if (fs.existsSync(PUBLIC_DIR)) {
   app.get('*', (req, res) => {
     if (req.path.startsWith('/api/')) return res.status(404).json({error:'not_found'});
