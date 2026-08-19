@@ -24,12 +24,13 @@ Source: "D:\AR_ChatBot\backend\package.json"; DestDir: "{app}\backend"; Flags: i
 Source: "D:\AR_ChatBot\app\build\web\*"; DestDir: "{app}\web"; Flags: recursesubdirs
 Source: "D:\AR_ChatBot\widget\*"; DestDir: "{app}\widget"; Flags: recursesubdirs
 Source: "D:\AR_ChatBot\start.bat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\AR_ChatBot\launch.vbs"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\AR_ChatBot\dist\ar_chatbot.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\AR_ChatBot"; Filename: "{app}\start.bat"; WorkingDir: "{app}"; IconFilename: "{app}\ar_chatbot.ico"
 Name: "{group}\Uninstall AR_ChatBot"; Filename: "{uninstallexe}"
-Name: "{userdesktop}\AR_ChatBot"; Filename: "{app}\start.bat"; WorkingDir: "{app}"; IconFilename: "{app}\ar_chatbot.ico"; Tasks: desktopicon
+Name: "{userdesktop}\AR_ChatBot"; Filename: "{app}\launch.vbs"; WorkingDir: "{app}"; IconFilename: "{app}\ar_chatbot.ico"; Tasks: desktopicon
 
 [Tasks]
 Name: "desktopicon"; Description: "Create desktop shortcut"; GroupDescription: "Additional icons:"; Flags: checkedonce
