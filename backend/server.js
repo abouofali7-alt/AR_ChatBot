@@ -233,7 +233,7 @@ app.post('/api/code/generate', auth.requireAuth, async (req, res) => {
     if (!prompt) { res.write(`data: ${JSON.stringify({error:'prompt_required'})}\n\n`); res.end(); return; }
 
     const config = loadJSON('config.json');
-    const codePrompt = `You are an expert coding assistant. Generate ONLY the code for the following request. Language: ${language || 'auto'}.\n\nIMPORTANT RULES:\n- Output ONLY the code inside a single markdown code block with the correct language tag\n- No explanations, no greetings, no extra text before or after the code block\n- If the request needs multiple files, separate them with clear comments\n- Write clean, well-commented code\n\nRequest: ${prompt}`;
+    const codePrompt = `You are an expert coding assistant. Generate ONLY the code for the following request. Language: ${language || 'auto'}.\n\nIMPORTANT RULES:\n- Output ONLY the code inside a single markdown code block with the correct language tag\n- No explanations, no greetings, no extra text before or after the code block\n- If the request needs multiple files, separate them with clear comments\n- Write clean, well-commented code\n- For JavaScript: use browser-compatible code (no require, no module.exports, no Node.js APIs)\n- Use console.log() for output\n\nRequest: ${prompt}`;
 
     const fakeRes = {
       write: (data) => {
