@@ -1,7 +1,7 @@
 [Setup]
 AppId={{AR-CHATBOT-2026-0001}
 AppName=AR_ChatBot
-AppVersion=1.0.0
+AppVersion=1.1.0
 AppPublisher=AR_ChatBot
 DefaultDirName={localappdata}\AR_ChatBot
 DefaultGroupName=AR_ChatBot
@@ -15,6 +15,9 @@ DisableDirPage=no
 UninstallDisplayIcon={app}\ar_chatbot.ico
 SetupIconFile=D:\AR_ChatBot\dist\ar_chatbot.ico
 WizardStyle=modern
+
+[InstallDelete]
+Type: files; Name: "{userdesktop}\AR_ChatBot.lnk"
 
 [Files]
 Source: "D:\AR_ChatBot\backend\server.js"; DestDir: "{app}\backend"; Flags: ignoreversion

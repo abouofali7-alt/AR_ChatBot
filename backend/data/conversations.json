@@ -1,74 +1,20 @@
 {
-  "test999": {
-    "id": "test999",
-    "title": "?????",
+  "9352db23-294d-4015-8abe-e9a9ee6c4860": {
+    "id": "9352db23-294d-4015-8abe-e9a9ee6c4860",
+    "title": "اكتبلي كود Python لحساب الفيبوناتشي",
     "messages": [
       {
         "role": "user",
-        "content": "?????",
-        "ts": 1787101210719
+        "content": "اكتبلي كود Python لحساب الفيبوناتشي",
+        "ts": 1787102239582
       },
       {
         "role": "assistant",
-        "content": "Sorry, I'm having a technical issue. Please try again in a moment.",
-        "ts": 1787101211327
+        "content": "اتفضل يا باشا، ده كود بسيط بلغة بايثون بيعمل دالة تحسبلك سلسلة الفيبوناتشي لحد الرقم اللي تحدده. ```python\ndef fibonacci(n): if n <= 0: return [] elif n == 1: return [0] sequence = [0, 1] while len(sequence) < n: sequence.append(sequence[-1] + sequence[-2]) return sequence # جرب الكود هنا عشان يطبع أول 10 أرقام\nprint(fibonacci(10))\n``` الكود ده بيعتمد على التكرار عشان يبني السلسلة خطوة بخطوة بطريقة سريعة ويرجعهالك في قائمة جاهزة.",
+        "ts": 1787102255653
       }
     ],
-    "createdAt": 1787101210718,
-    "updatedAt": 1787101211327
-  },
-  "test777": {
-    "id": "test777",
-    "title": "?????",
-    "messages": [
-      {
-        "role": "user",
-        "content": "?????",
-        "ts": 1787101241334
-      },
-      {
-        "role": "assistant",
-        "content": "Sorry, I'm having a technical issue. Please try again in a moment.",
-        "ts": 1787101241703
-      }
-    ],
-    "createdAt": 1787101241334,
-    "updatedAt": 1787101241703
-  },
-  "test888": {
-    "id": "test888",
-    "title": "????? ???",
-    "messages": [
-      {
-        "role": "user",
-        "content": "????? ???",
-        "ts": 1787101293998
-      },
-      {
-        "role": "assistant",
-        "content": "يا اهلا وسهلا يا باشا/ باشاته! لو محتاج مساعدة في حاجة معينة او استفسار, قول لي كده واشرحلي عايز تعرف ايه وانا تحت امرك يا جميل! طب يلا بينا نشوف حكاية ال ??????? دي! لو عايز تحط صور في محادثتنا دي، ممكن تستخدم مواقع رفع الصور زي imgur او imgfave وتحط اللنك هنا، وانا هظبطلك الموضوع. ولا ايه رأيك؟",
-        "ts": 1787101294622
-      }
-    ],
-    "createdAt": 1787101293998,
-    "updatedAt": 1787101294622
-  },
-  "testg1": {
-    "id": "testg1",
-    "title": "?????? poem ???? ?? ?????",
-    "messages": [
-      {
-        "role": "user",
-        "content": "?????? poem ???? ?? ?????",
-        "ts": 1787101971862
-      },
-      {
-        "role": "assistant",
-        "content": "واضح إن الكلام مش باين كويس، تحب أكتبلك قصيدة عن إيه بالظبط؟ قولي موضوعها وعنيا ليك.",
-        "ts": 1787101975433
-      }
-    ],
-    "createdAt": 1787101971862,
-    "updatedAt": 1787101975433
+    "createdAt": 1787102239574,
+    "updatedAt": 1787102255653
   }
 }
