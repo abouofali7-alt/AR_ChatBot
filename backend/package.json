@@ -8,15 +8,17 @@
     "dev": "node --watch server.js"
   },
   "dependencies": {
-    "express": "^4.21.0",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.3",
     "socket.io": "^4.8.0",
     "uuid": "^10.0.0"
   },
   "optionalDependencies": {
-    "whatsapp-web.js": "^1.26.0",
     "qrcode": "^1.5.4",
-    "telegraf": "^4.0.0"
+    "telegraf": "^4.0.0",
+    "whatsapp-web.js": "^1.26.0"
   },
   "engines": {
     "node": ">=18.0.0"

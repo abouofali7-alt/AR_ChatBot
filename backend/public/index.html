@@ -148,11 +148,63 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes dot{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @media(max-width:768px){.sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100}.sidebar.collapsed{width:0}.dl-row{flex-direction:column}.sug-grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr}.titlebar .tright{display:none}}
+
+.auth-page{display:none;flex:1;align-items:center;justify-content:center;background:var(--bg)}
+.auth-page.show{display:flex}
+.auth-box{width:380px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px}
+.auth-box h2{font-size:1.3rem;font-weight:600;margin-bottom:6px;text-align:center;background:linear-gradient(135deg,#8b5cf6,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.auth-box .sub{text-align:center;color:var(--muted);font-size:.8rem;margin-bottom:20px}
+.auth-tabs{display:flex;gap:0;margin-bottom:20px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.auth-tab{flex:1;padding:9px;text-align:center;cursor:pointer;font-size:.82rem;background:transparent;color:var(--muted);border:none;transition:all .15s}
+.auth-tab.active{background:var(--blue);color:#fff}
+.auth-fg{margin-bottom:14px}
+.auth-fg label{display:block;margin-bottom:4px;font-size:.78rem;color:var(--muted)}
+.auth-fg input,.auth-fg select{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.85rem;outline:none;font-family:inherit}
+.auth-fg input:focus,.auth-fg select:focus{border-color:var(--blue)}
+.auth-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.auth-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:8px 12px;border-radius:6px;font-size:.78rem;margin-bottom:12px;display:none}
+.user-badge{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;background:var(--surface2);font-size:.78rem;color:var(--text)}
+.user-badge .name{font-weight:500}
+.user-badge .type{font-size:.65rem;color:var(--muted);background:var(--bg);padding:1px 6px;border-radius:3px}
+.user-menu{position:absolute;top:44px;left:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px;display:none;z-index:200;min-width:160px}
+.user-menu.show{display:block}
+.user-menu button{width:100%;padding:8px 12px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:.8rem;text-align:right;border-radius:4px;transition:background .15s}
+.user-menu button:hover{background:var(--surface2);color:var(--text)}
 </style>
 </head>
 <body>
 
-<div class="titlebar">
+<div id="authPage" class="auth-page show">
+<div class="auth-box">
+  <h2>AR_ChatBot</h2>
+  <p class="sub">Sign in to continue</p>
+  <div class="auth-tabs">
+    <button class="auth-tab active" onclick="showAuthTab('login')">Login</button>
+    <button class="auth-tab" onclick="showAuthTab('register')">Register</button>
+  </div>
+  <div class="auth-err" id="authErr"></div>
+  <div id="loginForm">
+    <div class="auth-fg"><label>Email</label><input id="loginEmail" type="email" placeholder="you@email.com"></div>
+    <div class="auth-fg"><label>Password</label><input id="loginPass" type="password" placeholder="Your password"></div>
+    <button class="btn" style="width:100%" onclick="doLogin()">Login</button>
+  </div>
+  <div id="registerForm" style="display:none">
+    <div class="auth-fg"><label>Full Name</label><input id="regName" placeholder="Your name"></div>
+    <div class="auth-fg"><label>Email</label><input id="regEmail" type="email" placeholder="you@email.com"></div>
+    <div class="auth-fg"><label>Password</label><input id="regPass" type="password" placeholder="Min 6 characters"></div>
+    <div class="auth-fg"><label>Account Type</label>
+      <select id="regType">
+        <option value="personal">Personal</option>
+        <option value="business">Business</option>
+        <option value="developer">Developer</option>
+      </select>
+    </div>
+    <button class="btn" style="width:100%" onclick="doRegister()">Create Account</button>
+  </div>
+</div>
+</div>
+
+<div class="titlebar" id="appTitlebar" style="display:none">
   <div class="tleft"><div class="dot"></div>AR_ChatBot v1.1</div>
   <div class="tright">
     <button>_</button>
@@ -168,6 +220,15 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
   </div>
   <div class="convo-list" id="convoList"></div>
   <div class="sidebar-foot">
+    <div class="user-badge" id="userBadge" style="display:none;cursor:pointer;position:relative" onclick="toggleUserMenu()">
+      <span class="name" id="userName"></span>
+      <span class="type" id="userType"></span>
+      <div class="user-menu" id="userMenu">
+        <button onclick="showPage('settings')">&#9881; Settings</button>
+        <button onclick="showPage('api')">&#128273; API</button>
+        <button onclick="doLogout()" style="color:#ef4444">&#10148; Logout</button>
+      </div>
+    </div>
     <button id="navChat" class="active" onclick="showPage('chat')">&#128172; Chat</button>
     <button id="navSettings" onclick="showPage('settings')">&#9881; Settings</button>
     <button id="navAPI" onclick="showPage('api')">&#128273; API</button>
@@ -241,10 +302,21 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 
 <div class="toast" id="toast"></div>
 <script>
-const API=location.origin;let token=localStorage.getItem('arcb_token')||'ar_chatbot_2026';localStorage.setItem('arcb_token',token);
-let currentConvo=null,streaming=false;
+const API=location.origin;
+let token=localStorage.getItem('arcb_token')||'';
+let currentUser=null,currentConvo=null,streaming=false;
 const H=()=>({'Content-Type':'application/json','Authorization':'Bearer '+token});
-async function api(p,m='GET',b=null){const o={method:m,headers:H()};if(b)o.body=JSON.stringify(b);const r=await fetch(API+p,o);if(r.status===401){localStorage.removeItem('arcb_token');location.reload();return null}return r.json()}
+async function api(p,m='GET',b=null){const o={method:m,headers:H()};if(b)o.body=JSON.stringify(b);const r=await fetch(API+p,o);if(r.status===401){doLogout();return null}if(!r.ok)return null;return r.json()}
+
+function showAuthTab(tab){document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));document.getElementById('loginForm').style.display=tab==='login'?'block':'none';document.getElementById('registerForm').style.display=tab==='register'?'block':'none';document.querySelectorAll('.auth-tab')[tab==='login'?0:1].classList.add('active');document.getElementById('authErr').style.display='none'}
+function authError(m){const e=document.getElementById('authErr');e.textContent=m;e.style.display='block'}
+async function doLogin(){const email=document.getElementById('loginEmail').value.trim();const pass=document.getElementById('loginPass').value;if(!email||!pass)return authError('Enter email and password');const r=await fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});const d=await r.json();if(d.error)return authError(d.error);token=d.token;localStorage.setItem('arcb_token',token);currentUser=d.user;showApp()}
+async function doRegister(){const name=document.getElementById('regName').value.trim();const email=document.getElementById('regEmail').value.trim();const pass=document.getElementById('regPass').value;const type=document.getElementById('regType').value;if(!name||!email||!pass)return authError('Fill all fields');if(pass.length<6)return authError('Password min 6 chars');const r=await fetch(API+'/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password:pass,accountType:type})});const d=await r.json();if(d.error)return authError(d.error);token=d.token;localStorage.setItem('arcb_token',token);currentUser=d.user;showApp()}
+function doLogout(){token='';currentUser=null;localStorage.removeItem('arcb_token');document.getElementById('authPage').classList.add('show');document.querySelector('.titlebar').style.display='none';document.querySelector('.app-body').style.display='none';loadConversations=[]}
+async function showApp(){document.getElementById('authPage').classList.remove('show');document.querySelector('.titlebar').style.display='flex';document.querySelector('.app-body').style.display='flex';if(currentUser){document.getElementById('userBadge').style.display='flex';document.getElementById('userName').textContent=currentUser.name;document.getElementById('userType').textContent=currentUser.accountType}else{const me=await api('/api/auth/me');if(me){currentUser=me;document.getElementById('userBadge').style.display='flex';document.getElementById('userName').textContent=me.name;document.getElementById('userType').textContent=me.accountType}else{doLogout();return}}loadConversations()}
+function toggleUserMenu(){document.getElementById('userMenu').classList.toggle('show')}
+document.addEventListener('click',e=>{if(!e.target.closest('.user-badge'))document.getElementById('userMenu').classList.remove('show')});
+
 marked.setOptions({highlight:(c,l)=>l&&hljs.getLanguage(l)?hljs.highlight(c,{language:l}).value:hljs.highlightAuto(c).value,breaks:true,gfm:true});
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed')}
@@ -290,7 +362,8 @@ async function toggleKey(id){await api('/api/keys/'+id+'/toggle','POST');loadAPI
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2500)}
 document.getElementById('msgInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg()}});
 document.getElementById('msgInput').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,140)+'px'});
-loadConversations();
+
+(async function init(){if(token){const me=await api('/api/auth/me');if(me){currentUser=me;showApp();return}}doLogout()})();
 </script>
 </body>
 </html>

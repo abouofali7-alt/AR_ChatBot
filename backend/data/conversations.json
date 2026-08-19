@@ -16,5 +16,24 @@
     ],
     "createdAt": 1787103866950,
     "updatedAt": 1787103881604
+  },
+  "test-auth-1": {
+    "id": "test-auth-1",
+    "userId": "0c75a48e-573d-449c-a7c9-1aace791bd5f",
+    "title": "?????",
+    "messages": [
+      {
+        "role": "user",
+        "content": "?????",
+        "ts": 1787106055454
+      },
+      {
+        "role": "assistant",
+        "content": "أهلاً بيك، أنا معاك من AR_ChatBot. قولي محتاج مساعدة في إيه النهاردة؟",
+        "ts": 1787106059152
+      }
+    ],
+    "createdAt": 1787106055454,
+    "updatedAt": 1787106059152
   }
 }

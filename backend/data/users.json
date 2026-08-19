@@ -1,0 +1,13 @@
+{
+  "users": [
+    {
+      "id": "0c75a48e-573d-449c-a7c9-1aace791bd5f",
+      "name": "Test User",
+      "email": "test@test.com",
+      "password": "$2b$10$GPK8bze9u0OHiKrk.agec.8/h6R83Cax/8ihTTkRTDe3VBngozI8G",
+      "accountType": "personal",
+      "createdAt": 1787106031773,
+      "lastLogin": 1787106054693
+    }
+  ]
+}

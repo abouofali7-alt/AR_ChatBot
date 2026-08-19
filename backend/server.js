@@ -5,6 +5,7 @@ const { Server } = require('socket.io');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
+const auth = require('./src/auth');
 const ai = require('./src/ai');
 const channels = require('./src/channels');
 const routes = require('./src/routes');
@@ -57,16 +58,9 @@ if (!fs.existsSync(path.join(DATA_DIR, 'config.json'))) {
   saveJSON('config.json', defaultConfig);
 }
 
-function requireAuth(req, res, next) {
-  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-  const config = loadJSON('config.json');
-  if (token === config.apiKey) return next();
-  return res.status(401).json({ error: 'unauthorized' });
-}
-
 app.get('/healthz', (req, res) => res.json({ ok: true, version: '1.0.0' }));
 
-app.post('/api/chat', requireAuth, async (req, res) => {
+app.post('/api/chat', auth.requireAuth, async (req, res) => {
   try {
     const { message, sessionId, language, context } = req.body;
     if (!message) return res.status(400).json({ error: 'message_required' });
@@ -105,7 +99,7 @@ app.post('/api/chat', requireAuth, async (req, res) => {
   }
 });
 
-app.get('/api/sessions', requireAuth, (req, res) => {
+app.get('/api/sessions', auth.requireAuth, (req, res) => {
   const sessions = loadJSON('sessions.json');
   const list = Object.values(sessions).sort((a, b) => {
     const aLast = a.messages[a.messages.length - 1]?.ts || 0;
@@ -121,27 +115,27 @@ app.get('/api/sessions', requireAuth, (req, res) => {
   res.json(list);
 });
 
-app.get('/api/sessions/:id', requireAuth, (req, res) => {
+app.get('/api/sessions/:id', auth.requireAuth, (req, res) => {
   const sessions = loadJSON('sessions.json');
   const session = sessions[req.params.id];
   if (!session) return res.status(404).json({ error: 'not_found' });
   res.json(session);
 });
 
-app.delete('/api/sessions/:id', requireAuth, (req, res) => {
+app.delete('/api/sessions/:id', auth.requireAuth, (req, res) => {
   const sessions = loadJSON('sessions.json');
   delete sessions[req.params.id];
   saveJSON('sessions.json', sessions);
   res.json({ ok: true });
 });
 
-app.get('/api/config', requireAuth, (req, res) => {
+app.get('/api/config', auth.requireAuth, (req, res) => {
   const config = loadJSON('config.json');
   if (config.apiKey) config.apiKey = config.apiKey.slice(0, 8) + '****';
   res.json(config);
 });
 
-app.post('/api/config', requireAuth, (req, res) => {
+app.post('/api/config', auth.requireAuth, (req, res) => {
   const current = loadJSON('config.json');
   const patch = req.body || {};
   const updated = { ...current, ...patch };
@@ -166,7 +160,7 @@ app.get('/api/languages', (req, res) => {
 channels.init(app, io, loadJSON, saveJSON);
 routes.init(app, io);
 
-app.post('/api/chat/stream', requireAuth, async (req, res) => {
+app.post('/api/chat/stream', auth.requireAuth, async (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
@@ -179,7 +173,7 @@ app.post('/api/chat/stream', requireAuth, async (req, res) => {
     const convos = loadJSON('conversations.json', {});
     const cid = conversationId || uuidv4();
 
-    if (!convos[cid]) convos[cid] = { id: cid, title: message.substring(0, 50), messages: [], createdAt: Date.now(), updatedAt: Date.now() };
+    if (!convos[cid]) convos[cid] = { id: cid, userId: req.user.id, title: message.substring(0, 50), messages: [], createdAt: Date.now(), updatedAt: Date.now() };
     convos[cid].messages.push({ role: 'user', content: message, ts: Date.now() });
 
     const history = convos[cid].messages.map(m => ({ role: m.role, content: m.content }));
