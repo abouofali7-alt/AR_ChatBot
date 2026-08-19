@@ -143,15 +143,6 @@ async function generateReply(messages, opts = {}) {
   const lang = opts.language || 'ar';
   const dialect = opts.dialect || (lang === 'ar' ? 'egyptian' : lang === 'en' ? 'american' : 'france');
 
-  const lastUser = [...messages].reverse().find(m => m.role === 'user');
-  if (lastUser) {
-    const template = matchTemplate(lastUser.text || lastUser.content || '', lang, dialect);
-    if (template) {
-      log(`template [${lang}/${dialect}]: "${template.substring(0, 60)}"`);
-      return template;
-    }
-  }
-
   const langInstruction = LANG_INSTRUCTIONS[lang] || LANG_INSTRUCTIONS.en;
   const personality = opts.personality || '';
   const company = opts.company || '';
@@ -220,6 +211,15 @@ Rules:
 
   if (rawReply) {
     return cleanReply(rawReply);
+  }
+
+  const lastUser = [...messages].reverse().find(m => m.role === 'user');
+  if (lastUser) {
+    const template = matchTemplate(lastUser.text || lastUser.content || '', lang, dialect);
+    if (template) {
+      log(`template fallback [${lang}/${dialect}]: "${template.substring(0, 60)}"`);
+      return template;
+    }
   }
 
   log(`All providers failed for lang=${lang}`);
