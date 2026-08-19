@@ -19,6 +19,7 @@ WizardStyle=modern
 [Files]
 Source: "D:\AR_ChatBot\backend\server.js"; DestDir: "{app}\backend"; Flags: ignoreversion
 Source: "D:\AR_ChatBot\backend\src\*"; DestDir: "{app}\backend\src"; Flags: recursesubdirs
+Source: "D:\AR_ChatBot\backend\public\*"; DestDir: "{app}\backend\public"; Flags: recursesubdirs ignoreversion
 Source: "D:\AR_ChatBot\backend\data\config.json"; DestDir: "{app}\backend\data"; Flags: ignoreversion
 Source: "D:\AR_ChatBot\backend\package.json"; DestDir: "{app}\backend"; Flags: ignoreversion
 Source: "D:\AR_ChatBot\app\build\web\*"; DestDir: "{app}\web"; Flags: recursesubdirs

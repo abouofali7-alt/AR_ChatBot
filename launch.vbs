@@ -1,40 +1,41 @@
 Set WshShell = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
 appDir = fso.GetParentFolderName(WScript.ScriptFullName)
-
 WshShell.CurrentDirectory = appDir
 
-' Start server in background (hidden window)
-WshShell.Run "cmd /c cd /d """ & appDir & "\backend"" && node server.js", 0, False
-
-' Wait for server to be ready
-WScript.Sleep 2500
-
-' Open in Edge/Chrome app mode (no address bar = looks like native app)
 Dim url
 url = "http://localhost:3000"
-Dim opened
-opened = False
 
-' Try Edge
+' Check if server already running
+Dim alreadyRunning
+alreadyRunning = False
+On Error Resume Next
+Dim httpCheck
+Set httpCheck = CreateObject("MSXML2.XMLHTTP")
+httpCheck.Open "GET", "http://localhost:3000/healthz", False
+httpCheck.Send
+If httpCheck.Status = 200 Then alreadyRunning = True
+On Error GoTo 0
+
+If Not alreadyRunning Then
+    ' Start server completely hidden (no CMD window)
+    WshShell.Run "node backend/server.js", 0, False
+    WScript.Sleep 2000
+End If
+
+' Open in Edge app mode (looks like native app)
 Dim edgePath
 edgePath = WshShell.ExpandEnvironmentStrings("%ProgramFiles(x86)%") & "\Microsoft\Edge\Application\msedge.exe"
 If fso.FileExists(edgePath) Then
     WshShell.Run """" & edgePath & """ --app=" & url & " --window-size=1200,800 --window-name=AR_ChatBot --disable-features=TranslateUI", 1, False
-    opened = True
+    WScript.Quit
 End If
 
-If Not opened Then
-    ' Try Chrome
-    Dim chromePath
-    chromePath = WshShell.ExpandEnvironmentStrings("%ProgramFiles%") & "\Google\Chrome\Application\chrome.exe"
-    If fso.FileExists(chromePath) Then
-        WshShell.Run """" & chromePath & """ --app=" & url & " --window-size=1200,800 --window-name=AR_ChatBot", 1, False
-        opened = True
-    End If
+Dim chromePath
+chromePath = WshShell.ExpandEnvironmentStrings("%ProgramFiles%") & "\Google\Chrome\Application\chrome.exe"
+If fso.FileExists(chromePath) Then
+    WshShell.Run """" & chromePath & """ --app=" & url & " --window-size=1200,800 --window-name=AR_ChatBot", 1, False
+    WScript.Quit
 End If
 
-If Not opened Then
-    ' Fallback: default browser
-    WshShell.Run url, 1, False
-End If
+WshShell.Run url, 1, False
