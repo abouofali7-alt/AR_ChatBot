@@ -164,7 +164,7 @@ ${custom ? `Additional instructions: ${custom}` : ''}
 Rules:
 - Be natural and helpful
 - Answer thoroughly with complete code and explanations
-- Use markdown formatting for code blocks
+- CRITICAL: ALL code MUST be wrapped in proper markdown code blocks with language tag like \`\`\`python ... \`\`\` or \`\`\`javascript ... \`\`\` or \`\`\`html ... \`\`\` etc. Never output raw code without markdown fencing.
 - Never truncate responses prematurely
 - Reply in the same language the user used.`;
 

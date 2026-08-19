@@ -64,7 +64,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .avatar{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
 .msg.user .avatar{background:#5b5fc7;color:#fff}
 .msg.bot .avatar{background:#19c37d;color:#fff}
-.bubble{line-height:1.7;font-size:.9rem;max-width:calc(100% - 50px);word-wrap:break-word}
+.bubble{line-height:1.7;font-size:.9rem;max-width:calc(100% - 50px);word-wrap:break-word;overflow:hidden}
 .bubble h1,.bubble h2,.bubble h3{margin:12px 0 6px;color:var(--blue)}
 .bubble p{margin:4px 0}
 .bubble ul,.bubble ol{padding-right:18px;margin:4px 0}
@@ -75,14 +75,28 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .bubble code{font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-size:.82rem}
 .bubble :not(pre)>code{background:rgba(139,92,246,.15);padding:2px 5px;border-radius:4px}
 
-.code-block{position:relative;margin:8px 0;border-radius:8px;overflow:hidden;border:1px solid #2a2a3e}
+.code-block{position:relative;margin:8px 0;border-radius:8px;border:1px solid #2a2a3e;overflow:hidden;max-width:100%}
 .code-header{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#16162a;border-bottom:1px solid #2a2a3e}
 .code-lang{font-size:.7rem;color:#888;font-family:monospace}
-.code-copy{padding:3px 10px;border-radius:4px;border:1px solid #444;background:transparent;color:#aaa;font-size:.7rem;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:4px}
-.code-copy:hover{background:#333;color:#fff;border-color:#666}
+.code-btns{display:flex;gap:6px}
+.code-copy,.code-run{padding:3px 10px;border-radius:4px;border:1px solid #444;background:transparent;color:#aaa;font-size:.7rem;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:4px}
+.code-copy:hover,.code-run:hover{background:#333;color:#fff;border-color:#666}
 .code-copy.copied{background:#19c37d;color:#fff;border-color:#19c37d}
-.code-block pre{margin:0;padding:12px 14px;overflow-x:auto;font-size:.78rem;background:#1a1a2e}
-.code-block pre code{background:transparent!important;padding:0!important}
+.code-run{border-color:#19c37d;color:#19c37d}
+.code-run:hover{background:#19c37d;color:#fff}
+.code-block pre{margin:0;padding:12px 14px;overflow-x:auto;font-size:.78rem;background:#1a1a2e;max-height:400px;overflow-y:auto}
+.code-block pre code{background:transparent!important;padding:0!important;white-space:pre;word-wrap:normal}
+
+.run-output{display:none;border-top:1px solid #2a2a3e;background:#0d0d1a}
+.run-output.open{display:block}
+.run-toolbar{display:flex;align-items:center;justify-content:space-between;padding:4px 12px;background:#111125;border-bottom:1px solid #2a2a3e}
+.run-toolbar span{font-size:.65rem;color:#19c37d;font-family:monospace}
+.run-toolbar button{padding:2px 8px;border-radius:3px;border:1px solid #333;background:transparent;color:#888;font-size:.65rem;cursor:pointer;font-family:inherit}
+.run-toolbar button:hover{color:#fff;border-color:#555}
+.run-terminal{padding:10px 14px;font-family:'Cascadia Code','Fira Code',Consolas,monospace;font-size:.78rem;color:#0f0;min-height:60px;max-height:300px;overflow-y:auto;white-space:pre-wrap;line-height:1.5}
+.run-terminal .prompt{color:#888}
+.run-terminal .error{color:#ef4444}
+.run-terminal .info{color:#888}
 
 .typing{display:none;max-width:800px;width:100%;margin:0 auto;padding:0 44px}
 .typing span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--muted);margin:0 2px;animation:dot .6s infinite}
@@ -242,7 +256,15 @@ async function newChat(){const r=await api('/api/conversations','POST',{title:'N
 async function openConvo(id){currentConvo=id;showPage('chat');document.getElementById('welcomeScreen').style.display='none';const m=await api('/api/conversations/'+id+'/messages');if(!m)return;const el=document.getElementById('messages');el.innerHTML='';m.forEach(msg=>addMsg(msg.content,msg.role==='user'?'user':'bot',false));loadConversations()}
 async function delConvo(id){await api('/api/conversations/'+id,'DELETE');if(currentConvo===id){currentConvo=null;document.getElementById('messages').innerHTML='';document.getElementById('welcomeScreen').style.display='flex'}loadConversations()}
 
-function wrapCodeBlocks(container){container.querySelectorAll('pre code').forEach(b=>{if(b.parentElement.closest('.code-block'))return;const pre=b.parentElement;const lang=b.className.replace('hljs','').trim()||'code';const wrapper=document.createElement('div');wrapper.className='code-block';const header=document.createElement('div');header.className='code-header';header.innerHTML=`<span class="code-lang">${lang}</span><button class="code-copy" onclick="copyCode(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button>`;pre.parentElement.insertBefore(wrapper,pre);wrapper.appendChild(header);wrapper.appendChild(pre);hljs.highlightElement(b)});}
+function wrapCodeBlocks(container){container.querySelectorAll('pre code').forEach(b=>{if(b.parentElement.closest('.code-block'))return;const pre=b.parentElement;const lang=b.className.replace('hljs','').trim()||'code';const wrapper=document.createElement('div');wrapper.className='code-block';const header=document.createElement('div');header.className='code-header';const canRun=['javascript','js','html','css','python','py','json','bash','sh','powershell'].includes(lang);header.innerHTML=`<span class="code-lang">${lang}</span><div class="code-btns"><button class="code-copy" onclick="copyCode(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button>${canRun?`<button class="code-run" onclick="runCode(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> Run</button>`:''}</div>`;pre.parentElement.insertBefore(wrapper,pre);wrapper.appendChild(header);wrapper.appendChild(pre);const output=document.createElement('div');output.className='run-output';output.innerHTML=`<div class="run-toolbar"><span>Output</span><button onclick="this.closest('.run-output').classList.remove('open')">Close</button></div><div class="run-terminal"></div>`;wrapper.appendChild(output);hljs.highlightElement(b)});}
+
+function runCode(btn){const block=btn.closest('.code-block');const code=block.querySelector('code').textContent;const lang=block.querySelector('.code-lang').textContent.trim().toLowerCase();const output=block.querySelector('.run-output');const terminal=output.querySelector('.run-terminal');output.classList.add('open');terminal.innerHTML='<span class="info">Running...</span>';
+if(['javascript','js','json'].includes(lang)){try{const logs=[];const fakeConsole={log:(...a)=>logs.push(a.map(x=>typeof x==='object'?JSON.stringify(x,null,2):String(x)).join(' ')),error:(...a)=>logs.push('<span class="error">'+a.map(String).join(' ')+'</span>'),warn:(...a)=>logs.push('<span class="info">'+a.map(String).join(' ')+'</span>'),clear:()=>logs.length=0};const fn=new Function('console',code);fn(fakeConsole);terminal.innerHTML=logs.length?'<span class="prompt">$ </span>'+code.split('\n')[0]+'\n'+logs.join('\n'):'<span class="prompt">$ </span>'+code.split('\n')[0]+'\n<span class="info">(no output)</span>';}catch(e){terminal.innerHTML='<span class="prompt">$ </span>'+code.split('\n')[0]+'\n<span class="error">Error: '+e.message+'</span>'}}
+else if(['html'].includes(lang)){const iframe=document.createElement('iframe');iframe.style.cssText='width:100%;height:250px;border:none;border-radius:4px';iframe.sandbox='allow-scripts';terminal.innerHTML='';terminal.appendChild(iframe);iframe.srcdoc=code}
+else if(['css'].includes(lang)){const html=`<!DOCTYPE html><html><head><style>${code}</style></head><body><div style="padding:20px;font-family:sans-serif"><h1>Hello World</h1><p>This is a paragraph.</p><button>A Button</button></div></body></html>`;const iframe=document.createElement('iframe');iframe.style.cssText='width:100%;height:250px;border:none;border-radius:4px';iframe.sandbox='allow-scripts';terminal.innerHTML='';terminal.appendChild(iframe);iframe.srcdoc=html}
+else if(['python','py'].includes(lang)){terminal.innerHTML='<span class="prompt">$ python script.py</span>\n<span class="info">Running Python...</span>\n<span class="error">Note: Python execution requires a backend runtime.\nCopy the code and run it on your machine.</span>\n\n<span class="prompt">$</span> '+code.split('\n')[0]+'\n<span class="info">Tip: Install Python from python.org and run:\n  python script.py</span>'}
+else if(['bash','sh','powershell'].includes(lang)){terminal.innerHTML='<span class="prompt">$ '+code.split('\n')[0]+'</span>\n<span class="info">Shell commands run on the server.\nCopy and run locally for safety.</span>'}
+else{terminal.innerHTML='<span class="prompt">$ </span>Run: '+lang+'\n<span class="info">Execution not available for this language yet.</span>'}}
 
 function copyCode(btn){const code=btn.closest('.code-block').querySelector('code').textContent;navigator.clipboard.writeText(code).then(()=>{btn.classList.add('copied');btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';setTimeout(()=>{btn.classList.remove('copied');btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy'},1500)})}
 

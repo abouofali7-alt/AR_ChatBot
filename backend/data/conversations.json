@@ -1,20 +1,20 @@
 {
-  "9352db23-294d-4015-8abe-e9a9ee6c4860": {
-    "id": "9352db23-294d-4015-8abe-e9a9ee6c4860",
-    "title": "اكتبلي كود Python لحساب الفيبوناتشي",
+  "29e2431e-ea38-4beb-8d35-538acd441e75": {
+    "id": "29e2431e-ea38-4beb-8d35-538acd441e75",
+    "title": "اعملي برنامج كاشير وحسابات",
     "messages": [
       {
         "role": "user",
-        "content": "اكتبلي كود Python لحساب الفيبوناتشي",
-        "ts": 1787102239582
+        "content": "اعملي برنامج كاشير وحسابات",
+        "ts": 1787103867016
       },
       {
         "role": "assistant",
-        "content": "اتفضل يا باشا، ده كود بسيط بلغة بايثون بيعمل دالة تحسبلك سلسلة الفيبوناتشي لحد الرقم اللي تحدده. ```python\ndef fibonacci(n): if n <= 0: return [] elif n == 1: return [0] sequence = [0, 1] while len(sequence) < n: sequence.append(sequence[-1] + sequence[-2]) return sequence # جرب الكود هنا عشان يطبع أول 10 أرقام\nprint(fibonacci(10))\n``` الكود ده بيعتمد على التكرار عشان يبني السلسلة خطوة بخطوة بطريقة سريعة ويرجعهالك في قائمة جاهزة.",
-        "ts": 1787102255653
+        "content": "من عيني، عملتلك كود برنامج كاشير وحسابات كامل بالبايثون عشان تسجل مبيعاتك وتعرف حسابات المحل بسهولة. ```python\n# برنامج كاشير وحسابات مبسط بالبايثون class CashierSystem: def __init__(self): # قاعدة بيانات المنتجات: الرقم، الاسم، والسعر self.products = { \"1\": {\"name\": \"شيبسي\", \"price\": 10.0}, \"2\": {\"name\": \"بيبسي\", \"price\": 15.0}, \"3\": {\"name\": \"شوكولاتة\", \"price\": 20.0}, \"4\": {\"name\": \"مياه معدنية\", \"price\": 5.0} } self.sales_history = [] # لتسجيل كل الفواتير اليومية def show_menu(self): print(\"\\n--- قائمة المنتجات المتاحة ---\") for key, item in self.products.items(): print(f\"{key} - {item['name']}: {item['price']} جنيه\") print(\"-----------------------------\") def new_transaction(self): cart = {} print(\"\\n--- عملية بيع جديدة ---\") self.show_menu() while True: choice = input(\"اختار رقم المنتج (أو اكتب '0' لإنهاء الطلب): \").strip() if choice == '0': break if choice in self.products: try: quantity = int(input(f\"دخل الكمية من {self.products[choice]['name']}: \")) if quantity <= 0: print(\"الكمية لازم تكون أكتر من صفر!\") continue product_name = self.products[choice]['name'] product_price = self.products[choice]['price'] if product_name in cart: cart[product_name]['quantity'] += quantity else: cart[product_name] = {'price': product_price, 'quantity': quantity} print(f\"تم إضافة {quantity} {product_name} للسلّة.\") except ValueError: print(\"دخل رقم صحيح للكمية!\") else: print(\"رقم المنتج مش موجود، جرب تاني.\") if not cart: print(\"السلّة فاضية، مفيش مبيعات اتسجلت.\") return self.print_receipt(cart) def print_receipt(self, cart): total = 0 print(\"\\n==============================\") print(\" فاتورة البيع \") print(\"==============================\") for name, info in cart.items(): item_total = info['price'] * info['quantity'] total += item_total print(f\"{name} x {info['quantity']}: {item_total} جنيه\") print(\"------------------------------\") print(f\"الإجمالي: {total} جنيه\") try: paid = float(input(\"المبلغ المدفوع من الزبون: \")) change = paid - total if change < 0: print(\"المبلغ المدفوع مش كفاية!\") return print(f\"الباقي للزبون: {change} جنيه\") # حفظ العملية في الحسابات self.sales_history.append({\"items\": cart, \"total\": total}) print(\"تم حفظ الفاتورة بنجاح!\") except ValueError: print(\"خطأ في إدخال المبلغ، تم إلغاء العملية.\") print(\"==============================\\n\") def show_reports(self): print(\"\\n--- تقرير الحسابات والمبيعات اليومية ---\") if not self.sales_history: print(\"لسه مفيش أي مبيعات اتسجلت النهاردة.\") return total_sales = 0 total_items_sold = 0 for index, sale in enumerate(self.sales_history, 1): print(f\"\\nفاتورة رقم {index}:\") for name, info in sale['items'].items(): print(f\" - {name} (الكمية: {info['quantity']})\") total_items_sold += info['quantity'] print(f\"إجمالي الفاتورة: {sale['total']} جنيه\") total_sales += sale['total'] print(\"\\n--------------------------------\") print(f\"إجمالي مبيعات اليوم: {total_sales} جنيه\") print(f\"إجمالي القطع المباعة: {total_items_sold} قطعة\") print(\"--------------------------------\\n\") def main(): system = CashierSystem() while True: print(\"1. عملية بيع جديدة\") print(\"2. تقرير الحسابات والمبيعات\") print(\"3. خروج\") choice = input(\"اختار عاوز تعمل إيه: \").strip() if choice == '1': system.new_transaction() elif choice == '2': system.show_reports() elif choice == '3': print(\"مع السلامة!\") break else: print(\"اختيار غلط، جرب تاني.\") if __name__ == \"__main__\": main()\n``` الكود ده بيعملك فاتورة بيع وبيحسبلك الباقي للزبون وكمان بيسجل المبيعات اليومية في تقرير الحسابات. تقدر تشغله وتعدل على أسماء وأسعار المنتجات من الكود نفسه بكل سهولة.",
+        "ts": 1787103881604
       }
     ],
-    "createdAt": 1787102239574,
-    "updatedAt": 1787102255653
+    "createdAt": 1787103866950,
+    "updatedAt": 1787103881604
   }
 }
