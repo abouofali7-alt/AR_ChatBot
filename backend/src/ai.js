@@ -103,7 +103,7 @@ async function callGroq(messages, systemPrompt, apiKey, model, temperature) {
 }
 
 async function callGemini(messages, systemPrompt, apiKey, model, temperature) {
-  const modelName = model || 'gemini-2.0-flash';
+  const modelName = model || 'gemini-3.6-flash';
   const contents = messages.map(m => ({
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: m.text || m.content || '' }]
