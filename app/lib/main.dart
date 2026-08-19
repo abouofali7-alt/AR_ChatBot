@@ -3,6 +3,7 @@ import 'screens/home_screen.dart';
 import 'screens/chat_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/sessions_screen.dart';
+import 'screens/code_lab_screen.dart';
 import 'services/api_service.dart';
 
 void main() {
@@ -38,6 +39,7 @@ class ARChatBotApp extends StatelessWidget {
         '/chat': (context) => const ChatScreen(),
         '/settings': (context) => const SettingsScreen(),
         '/sessions': (context) => const SessionsScreen(),
+        '/codelab': (context) => const CodeLabScreen(),
       },
     );
   }

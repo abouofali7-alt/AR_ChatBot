@@ -145,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
       destinations: const [
         NavigationRailDestination(icon: Icon(Icons.dashboard), label: Text('Dashboard')),
         NavigationRailDestination(icon: Icon(Icons.chat), label: Text('Chat')),
+        NavigationRailDestination(icon: Icon(Icons.code), label: Text('Code Lab')),
         NavigationRailDestination(icon: Icon(Icons.settings), label: Text('Settings')),
       ],
     );
@@ -159,6 +160,10 @@ class _HomeScreenState extends State<HomeScreen> {
           return;
         }
         if (i == 2) {
+          Navigator.pushNamed(context, '/codelab');
+          return;
+        }
+        if (i == 3) {
           Navigator.pushNamed(context, '/settings');
           return;
         }
@@ -167,6 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
       destinations: const [
         NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
         NavigationDestination(icon: Icon(Icons.chat), label: 'Chat'),
+        NavigationDestination(icon: Icon(Icons.code), label: 'Code Lab'),
         NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
       ],
     );
