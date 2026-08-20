@@ -233,7 +233,7 @@ app.post('/api/code/generate', auth.requireAuth, async (req, res) => {
     if (!prompt) { res.write(`data: ${JSON.stringify({error:'prompt_required'})}\n\n`); res.end(); return; }
 
     const config = loadJSON('config.json');
-    const codePrompt = `You are an expert coding assistant. Generate a COMPLETE, RUNNABLE program for the following request.\n\nLanguage: ${language || 'auto'}\n\nSTRICT RULES:\n1. Output the COMPLETE program inside a single markdown code block with the correct language tag (e.g. \`\`\`javascript)\n2. Do NOT output partial code, snippets, or placeholders like "// your code here" or "// add more functionality"\n3. Every function must be fully implemented. Every variable must be defined. The program must run without any modifications.\n4. Well-formatted code: proper indentation (2 spaces), each statement on its own line, blank lines between logical sections\n5. Include brief inline comments only where logic is non-obvious\n6. For JavaScript: write BROWSER-COMPATIBLE code only. Use console.log() for output, document.createElement() for DOM. NO require(), NO module.exports, NO import, NO React/JSX, NO Node.js APIs.\n7. If user asks for React/framework code, provide a working plain HTML/CSS/JavaScript alternative instead\n8. For Python: use standard library only unless user specifies otherwise\n9. Program must have a clear entry point and produce visible output when run\n10. No explanations, greetings, or text outside the code block\n\nRequest: ${prompt}`;
+    const codePrompt = `You are a SENIOR DEVELOPER generating production-quality code.\n\nLanguage: ${language || 'auto'}\nRequest: ${prompt}\n\nSTRICT RULES:\n1. Output the COMPLETE program inside a single markdown code block with the correct language tag\n2. EVERY function must be fully implemented with real logic — no stubs, no placeholders\n3. Well-formatted: 2-space indentation, each statement on its own line, blank lines between sections\n4. Include ALL imports, ALL variables, ALL error handling\n5. For JavaScript: browser-compatible only (no require, no import, no React/JSX). Use console.log(), document.createElement()\n6. If user asks for React: provide a working plain HTML/CSS/JS alternative\n7. Program must have a clear entry point and produce visible output when run\n8. Include brief inline comments for non-obvious logic\n9. No explanations, greetings, or text outside the code block\n10. Think like you're writing production code that will ship to customers`;
 
     const fakeRes = {
       write: (data) => {
@@ -253,6 +253,74 @@ app.post('/api/code/generate', auth.requireAuth, async (req, res) => {
       personality: 'Expert coder who outputs only code.',
       company: '',
       customInstructions: 'Output ONLY code. No explanations. No greetings. Just the code in a markdown code block.',
+    });
+
+    const chunkSize = 8;
+    for (let i = 0; i < reply.length; i += chunkSize) {
+      res.write(`data: ${JSON.stringify({token: reply.substring(i, i + chunkSize), done:false})}\n\n`);
+    }
+    res.write(`data: ${JSON.stringify({token:'', done:true})}\n\n`);
+    res.end();
+  } catch (e) {
+    res.write(`data: ${JSON.stringify({error: e.message})}\n\n`);
+    res.end();
+  }
+});
+
+app.post('/api/project/build', auth.requireAuth, async (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  try {
+    const { description, language, framework } = req.body;
+    if (!description) { res.write(`data: ${JSON.stringify({error:'description_required'})}\n\n`); res.end(); return; }
+    const config = loadJSON('config.json');
+    const projectPrompt = `You are a SENIOR SOFTWARE ARCHITECT. Generate a COMPLETE, PRODUCTION-READY project.\n\nProject Description: ${description}\nLanguage: ${language || 'auto'}\nFramework: ${framework || 'auto'}\n\nOUTPUT FORMAT — Output EXACTLY this JSON structure inside a single markdown code block tagged \`\`\`json:\n{\n  "name": "project-name",\n  "description": "Brief project description",\n  "files": [\n    {\n      "path": "relative/file/path.ext",\n      "content": "FULL complete file content with proper indentation",\n      "explanation": "Detailed explanation of what this file does, its functions, classes, and how it connects to other files"\n    }\n  ],\n  "setup": [\n    "Step 1: ...",\n    "Step 2: ..."\n  ],\n  "steps": [\n    {\n      "number": 1,\n      "title": "Step title",\n      "description": "Detailed explanation of what this step does and why",\n      "files": ["file1.ext", "file2.ext"]\n    }\n  ]\n}\n\nSTRICT RULES:\n1. EVERY file must be 100% COMPLETE — no placeholders, no comments like "// add more here", no "// TODO"\n2. Every function must be FULLY implemented with real logic\n3. Proper indentation (2 spaces), clean formatting, blank lines between sections\n4. Each file's explanation must describe ALL functions, classes, and exports\n5. Steps must follow logical order: setup → data/models → core logic → UI → config\n6. Include ALL necessary files: entry point, modules, config, styles, README\n7. For JavaScript/web: use vanilla JS or the requested framework. Write complete HTML with embedded CSS/JS for single-file projects\n8. For Python: standard library only, full error handling\n9. Program must work immediately when files are assembled and run\n10. No text outside the JSON code block`;
+
+    const reply = await ai.generateReply([{ role: 'user', content: projectPrompt }], {
+      language: 'en',
+      apiKey: config.groqApiKey || '',
+      geminiApiKey: config.geminiApiKey || '',
+      provider: config.aiProvider || 'gemini',
+      model: config.aiModel || 'gemini-3.5-flash',
+      temperature: 0.2,
+      personality: 'Senior software architect who writes production-quality code with complete documentation.',
+      company: '',
+      customInstructions: 'Output ONLY the JSON code block. No explanations outside it.',
+    });
+
+    const chunkSize = 8;
+    for (let i = 0; i < reply.length; i += chunkSize) {
+      res.write(`data: ${JSON.stringify({token: reply.substring(i, i + chunkSize), done:false})}\n\n`);
+    }
+    res.write(`data: ${JSON.stringify({token:'', done:true})}\n\n`);
+    res.end();
+  } catch (e) {
+    res.write(`data: ${JSON.stringify({error: e.message})}\n\n`);
+    res.end();
+  }
+});
+
+app.post('/api/code/explain', auth.requireAuth, async (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  try {
+    const { code, language } = req.body;
+    if (!code) { res.write(`data: ${JSON.stringify({error:'code_required'})}\n\n`); res.end(); return; }
+    const config = loadJSON('config.json');
+    const explainPrompt = `You are an expert programming teacher. Explain the following code SECTION BY SECTION, function by function.\n\nLanguage: ${language || 'auto'}\n\nCode to explain:\n\`\`\`\n${code}\n\`\`\`\n\nFORMAT your response in markdown:\n1. Start with a one-line summary of what the code does overall\n2. Then for EACH major section/function/class, create a heading (##) and explain:\n   - What it does (purpose)\n   - How it works (logic breakdown)\n   - Key parameters and return values\n   - Any important patterns or techniques used\n3. End with "How it all connects" — explain how the pieces work together\n4. If there are any potential issues or improvements, mention them\n\nBe thorough but concise. Use code snippets in your explanation where helpful.`;
+
+    const reply = await ai.generateReply([{ role: 'user', content: explainPrompt }], {
+      language: 'en',
+      apiKey: config.groqApiKey || '',
+      geminiApiKey: config.geminiApiKey || '',
+      provider: config.aiProvider || 'gemini',
+      model: config.aiModel || 'gemini-3.5-flash',
+      temperature: 0.3,
+      personality: 'Expert programming teacher who explains code clearly with examples.',
+      company: '',
+      customInstructions: 'Explain code section by section with clear markdown formatting.',
     });
 
     const chunkSize = 8;

@@ -154,9 +154,10 @@ Language rules: ${langInstruction}
 ${custom ? `Additional instructions: ${custom}` : ''}
 Rules:
 - Be natural and helpful
-- When providing code: give COMPLETE, RUNNABLE programs — never partial snippets, never placeholders like "// your code here"
-- Code must be well-formatted: proper indentation (2 spaces), each statement on its own line, blank lines between logical sections
-- For JavaScript: use browser-compatible code only (no require, no module.exports, no import, no React/JSX). Use console.log() and document.createElement()
+- When providing code: give COMPLETE, PRODUCTION-QUALITY programs — never partial snippets, never placeholders
+- Code must be well-formatted: proper indentation (2 spaces), each statement on its own line, blank lines between logical sections, ALL error handling included
+- For JavaScript: browser-compatible code only (no require, no module.exports, no import, no React/JSX). Use console.log() and document.createElement()
+- Think like a senior developer writing code that will ship to customers
 - CRITICAL: ALL code MUST be wrapped in proper markdown code blocks with language tag like \`\`\`python ... \`\`\` or \`\`\`javascript ... \`\`\` or \`\`\`html ... \`\`\` etc. Never output raw code without markdown fencing.
 - Never truncate responses prematurely
 - Reply in the same language the user used.`;

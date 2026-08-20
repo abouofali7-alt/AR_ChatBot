@@ -215,6 +215,55 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .cl-tabs button.active{color:#19c37d;border-bottom-color:#19c37d}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:900px){.cl-body{flex-direction:column}.cl-preview{border-left:none;border-top:1px solid var(--border);max-height:40vh}.cl-editor{min-height:40vh}}
+
+.cl-mode-tabs{display:flex;gap:0;background:var(--surface);border-radius:8px;border:1px solid var(--border);overflow:hidden}
+.cl-mode-tab{padding:6px 14px;border:none;background:transparent;color:var(--muted);font-size:.78rem;cursor:pointer;transition:all .15s;font-family:inherit}
+.cl-mode-tab.active{background:var(--blue);color:#fff}
+.cl-mode-tab:hover:not(.active){background:var(--surface2);color:var(--text)}
+
+.file-tree{width:200px;background:#16162a;border-left:1px solid #2a2a3e;overflow-y:auto;flex-shrink:0;display:none}
+.file-tree.open{display:block}
+.file-tree-head{padding:8px 12px;font-size:.72rem;color:#888;border-bottom:1px solid #2a2a3e;text-transform:uppercase;letter-spacing:.5px}
+.file-item{padding:6px 12px;font-size:.78rem;color:#999;cursor:pointer;display:flex;align-items:center;gap:6px;border-bottom:1px solid #1a1a30;transition:background .1s;font-family:'Cascadia Code','Fira Code',monospace}
+.file-item:hover{background:#1e1e3a;color:#e0e0e0}
+.file-item.active{background:#252550;color:#8b5cf6;border-right:2px solid #8b5cf6}
+.file-item .fi-icon{font-size:.7rem;opacity:.5}
+.file-item .fi-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.explain-panel{width:320px;background:var(--surface);border-left:1px solid var(--border);display:none;flex-direction:column;overflow:hidden}
+.explain-panel.open{display:flex}
+.explain-head{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.explain-head span{font-size:.82rem;font-weight:600;color:var(--text)}
+.explain-head button{padding:3px 10px;border-radius:5px;border:1px solid #444;background:transparent;color:#aaa;font-size:.7rem;cursor:pointer;font-family:inherit}
+.explain-head button:hover{background:#333;color:#fff;border-color:#666}
+.explain-body{flex:1;overflow-y:auto;padding:14px;font-size:.82rem;line-height:1.7;color:#ccc}
+.explain-body h2{font-size:.95rem;color:var(--blue);margin:14px 0 6px}
+.explain-body h3{font-size:.88rem;color:#8b5cf6;margin:10px 0 4px}
+.explain-body p{margin:4px 0}
+.explain-body code{font-family:'Cascadia Code','Fira Code',monospace;font-size:.76rem;background:rgba(139,92,246,.12);padding:1px 4px;border-radius:3px}
+.explain-body pre{background:#1a1a2e;padding:8px;border-radius:4px;overflow-x:auto;margin:6px 0}
+.explain-body pre code{background:transparent;padding:0}
+
+.steps-panel{width:260px;background:#16162a;border-left:1px solid #2a2a3e;display:none;flex-direction:column;overflow:hidden}
+.steps-panel.open{display:flex}
+.steps-head{padding:10px 14px;border-bottom:1px solid #2a2a3e;font-size:.82rem;font-weight:600;color:#ccc}
+.steps-list{flex:1;overflow-y:auto;padding:8px}
+.step-item{padding:10px 12px;border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.step-item:hover{background:#1e1e3a;border-color:#333}
+.step-item.active{background:#252550;border-color:#8b5cf6}
+.step-item .step-num{font-size:.65rem;color:var(--blue);font-weight:700;margin-bottom:2px}
+.step-item .step-title{font-size:.8rem;color:var(--text);margin-bottom:3px}
+.step-item .step-desc{font-size:.72rem;color:var(--muted);line-height:1.4}
+.step-item .step-files{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.step-item .step-file{font-size:.62rem;padding:1px 5px;border-radius:3px;background:rgba(139,92,246,.15);color:#8b5cf6;font-family:monospace}
+.step-item.done{opacity:.6}
+.step-item.done .step-num{color:#19c37d}
+
+.cl-prompt-row{display:flex;gap:8px;align-items:flex-end}
+.cl-prompt-row .cl-prompt{flex:1}
+.cl-prompt-row .cl-mode-tabs{flex-shrink:0}
+
+.fw-select{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.82rem;outline:none;cursor:pointer}
 </style>
 </head>
 <body>
@@ -276,6 +325,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
     </div>
     <button id="navChat" class="active" onclick="showPage('chat')">&#128172; Chat</button>
     <button id="navCodelab" onclick="showPage('codelab')">&#128187; Code Lab</button>
+    <button id="navBuilder" onclick="showPage('builder')">&#128736; Project Builder</button>
     <button id="navSettings" onclick="showPage('settings')">&#9881; Settings</button>
     <button id="navAPI" onclick="showPage('api')">&#128273; API</button>
   </div>
@@ -346,7 +396,13 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
   <div id="codelabPage" class="cl-page">
     <div class="cl-top">
       <h2>&#128187; Code Lab</h2>
-      <div class="cl-prompt"><textarea id="clPrompt" placeholder="Describe the code you want... (e.g. 'Build a todo app in React', 'Python fibonacci with memoization', 'Login form with HTML/CSS')" rows="1"></textarea></div>
+      <div class="cl-prompt-row" style="flex:1;display:flex;gap:8px;align-items:flex-end">
+        <div class="cl-prompt" style="flex:1"><textarea id="clPrompt" placeholder="Describe what you want to build... (e.g. 'Build a complete todo app with add/delete/edit', 'Python web scraper for news sites')" rows="1"></textarea></div>
+        <div class="cl-mode-tabs">
+          <button class="cl-mode-tab active" onclick="clSetMode('single',this)">Single File</button>
+          <button class="cl-mode-tab" onclick="clSetMode('project',this)">Full Project</button>
+        </div>
+      </div>
       <div class="cl-controls">
         <select class="cl-lang" id="clLang">
           <option value="auto">Auto Detect</option>
@@ -362,31 +418,51 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
           <option value="rust">Rust</option>
           <option value="sql">SQL</option>
           <option value="bash">Bash</option>
-          <option value="json">JSON</option>
+        </select>
+        <select class="fw-select" id="clFramework">
+          <option value="">Any Framework</option>
+          <option value="vanilla">Vanilla JS</option>
+          <option value="react">React</option>
+          <option value="vue">Vue</option>
+          <option value="express">Express.js</option>
+          <option value="flask">Flask</option>
+          <option value="django">Django</option>
+          <option value="fastapi">FastAPI</option>
+          <option value="node">Node.js</option>
         </select>
         <button class="cl-gen" id="clGenBtn" onclick="clGenerate()"><div class="spinner"></div><span class="cl-gen-text">&#9654; Generate</span></button>
       </div>
     </div>
     <div class="cl-body">
+      <div class="file-tree" id="clFileTree">
+        <div class="file-tree-head">Project Files</div>
+        <div id="clFileList"></div>
+      </div>
       <div class="cl-editor">
         <div class="cl-editor-head">
           <span id="clLangLabel">code</span>
           <div class="cl-editor-btns">
+            <button onclick="clExplain()" title="Explain Code"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Explain</button>
             <button onclick="clCopy()" id="clCopyBtn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button>
             <button class="cl-run" onclick="clRun()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> Run</button>
           </div>
         </div>
-        <textarea class="cl-code" id="clEditor" placeholder="// Generated code will appear here...
-// You can also edit it manually before running." spellcheck="false"></textarea>
+        <textarea class="cl-code" id="clEditor" placeholder="// Generated code will appear here...&#10;// You can also edit it manually before running." spellcheck="false"></textarea>
       </div>
       <div class="cl-preview">
         <div class="cl-tabs">
           <button class="active" onclick="clShowTab('output',this)">Output</button>
           <button onclick="clShowTab('terminal',this)">Terminal</button>
+          <button onclick="clShowTab('explain',this)">Explanation</button>
         </div>
         <div class="cl-preview-head"><span id="clStatus">Ready</span><button onclick="clClearOutput()">Clear</button></div>
         <div class="cl-output" id="clOutput"><div class="cl-empty"><div class="ico">&#128187;</div>Click Generate or Run to see output</div></div>
         <div class="cl-terminal" id="clTerminal" style="display:none"></div>
+        <div class="cl-terminal" id="clExplainPanel" style="display:none;background:#1a1a2e;padding:16px;line-height:1.8;color:#ccc;font-family:inherit;font-size:.85rem"></div>
+      </div>
+      <div class="steps-panel" id="clStepsPanel">
+        <div class="steps-head">&#128218; Project Steps</div>
+        <div class="steps-list" id="clStepsList"><div style="padding:14px;color:#666;font-size:.78rem">Generate a Full Project to see steps here</div></div>
       </div>
     </div>
   </div>
@@ -424,7 +500,8 @@ function esc(s){const d=document.createElement('div');d.textContent=s;return d.i
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed')}
 function showPage(p){document.querySelectorAll('.page,.cl-page').forEach(e=>e.classList.remove('show'));document.querySelectorAll('.sidebar-foot button').forEach(b=>b.classList.remove('active'));const ia=document.getElementById('inputArea'),ca=document.getElementById('chatPage');
 if(p==='chat'){ia.style.display='block';ca.style.display='flex';document.getElementById('navChat').classList.add('active');document.getElementById('chatPage').style.display='flex'}
-else if(p==='codelab'){ia.style.display='none';ca.style.display='none';document.getElementById('codelabPage').classList.add('show');document.getElementById('navCodelab').classList.add('active')}
+else if(p==='codelab'||p==='builder'){ia.style.display='none';ca.style.display='none';document.getElementById('codelabPage').classList.add('show');document.getElementById('navCodelab').classList.add('active');
+  if(p==='builder'){clSetMode('project',document.querySelectorAll('.cl-mode-tab')[1])}}
 else{ia.style.display='none';ca.style.display='none';document.getElementById(p+'Page').classList.add('show');const navEl=document.getElementById('nav'+p.charAt(0).toUpperCase()+p.slice(1));if(navEl)navEl.classList.add('active');if(p==='settings')loadSettings();if(p==='api')loadAPIPage()}}
 
 async function loadConversations(){const l=await api('/api/conversations');if(!l)return;document.getElementById('convoList').innerHTML=l.map(c=>`<div class="convo ${currentConvo===c.id?'active':''}" onclick="openConvo('${c.id}')"><span>${esc(c.title)}</span><span class="del" onclick="event.stopPropagation();delConvo('${c.id}')">&#10005;</span></div>`).join('')}
@@ -468,29 +545,123 @@ document.getElementById('msgInput').addEventListener('keydown',e=>{if(e.key==='E
 document.getElementById('msgInput').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,140)+'px'});
 
 let clGenerating=false;
-function clShowTab(tab,btn){document.querySelectorAll('.cl-tabs button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('clOutput').style.display=tab==='output'?'block':'none';document.getElementById('clTerminal').style.display=tab==='terminal'?'block':'none'}
-function clClearOutput(){document.getElementById('clOutput').innerHTML='<div class="cl-empty"><div class="ico">&#128187;</div>Click Generate or Run to see output</div>';document.getElementById('clTerminal').innerHTML='';document.getElementById('clStatus').textContent='Ready'}
+let clMode='single';
+let clProjectData=null;
+let clCurrentFile=0;
+
+function clSetMode(mode,btn){
+  clMode=mode;
+  document.querySelectorAll('.cl-mode-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(mode==='single'){
+    document.getElementById('clStepsPanel').classList.remove('open');
+    document.getElementById('clFileTree').classList.remove('open');
+  }else{
+    document.getElementById('clStepsPanel').classList.add('open');
+  }
+  document.getElementById('clPrompt').placeholder=mode==='project'
+    ?'Describe the FULL project to build... (e.g. "E-commerce website with cart, auth, admin dashboard", "Blog platform with posts, comments, user profiles")'
+    :'Describe what you want to build... (e.g. "Python calculator", "HTML login form", "JavaScript todo app")';
+}
+
+function clShowTab(tab,btn){document.querySelectorAll('.cl-tabs button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('clOutput').style.display=tab==='output'?'block':'none';document.getElementById('clTerminal').style.display=tab==='terminal'?'block':'none';document.getElementById('clExplainPanel').style.display=tab==='explain'?'block':'none'}
+function clClearOutput(){document.getElementById('clOutput').innerHTML='<div class="cl-empty"><div class="ico">&#128187;</div>Click Generate or Run to see output</div>';document.getElementById('clTerminal').innerHTML='';document.getElementById('clExplainPanel').innerHTML='';document.getElementById('clStatus').textContent='Ready'}
 function clCopy(){const code=document.getElementById('clEditor').value;if(!code)return;navigator.clipboard.writeText(code).then(()=>{const b=document.getElementById('clCopyBtn');b.classList.add('cl-copied');b.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';setTimeout(()=>{b.classList.remove('cl-copied');b.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy'},1500)})}
+
 function clDetectLang(code){if(/def\s+\w+|import\s+\w+|from\s+\w+\s+import/.test(code))return'python';if(/(?:function|const|let|var|=>|async|await|document\.|window\.)/.test(code))return'javascript';if(/<!DOCTYPE|<html|<head|<body|<div|<span|<script|<style/.test(code))return'html';if(/\{[\s\S]*:\s*[\d#"']/.test(code)&&/[\w-]+\s*:\s*/.test(code))return'css';if(/SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|FROM\s+\w+/i.test(code))return'sql';if(/#include|using\s+namespace|int\s+main/.test(code))return'cpp';if(/package\s+\w+|func\s+\w+|public\s+class/.test(code))return'java';return'code'}
+
+function clSelectFile(idx){
+  clCurrentFile=idx;
+  if(!clProjectData||!clProjectData.files[idx])return;
+  document.getElementById('clEditor').value=clProjectData.files[idx].content;
+  const detected=clDetectLang(clProjectData.files[idx].content);
+  document.getElementById('clLangLabel').textContent=clProjectData.files[idx].path;
+  document.querySelectorAll('.file-item').forEach((f,i)=>f.classList.toggle('active',i===idx));
+  document.getElementById('clStatus').textContent='File: '+clProjectData.files[idx].path;
+}
+
+function clRenderProject(data){
+  clProjectData=data;
+  const tree=document.getElementById('clFileTree');
+  const list=document.getElementById('clFileList');
+  const stepsPanel=document.getElementById('clStepsPanel');
+  const stepsList=document.getElementById('clStepsList');
+  if(!data.files||!data.files.length){tree.classList.remove('open');return}
+  tree.classList.add('open');
+  list.innerHTML=data.files.map((f,i)=>{
+    const icon=f.path.endsWith('.py')?'&#128013;':f.path.endsWith('.js')?'&#9997;':f.path.endsWith('.html')?'&#127760;':f.path.endsWith('.css')?'&#127912;':f.path.endsWith('.json')?'&#128196;':f.path.endsWith('.md')?'&#128221;':'&#128196;';
+    return `<div class="file-item ${i===0?'active':''}" onclick="clSelectFile(${i})"><span class="fi-icon">${icon}</span><span class="fi-name">${f.path}</span></div>`;
+  }).join('');
+  if(data.steps&&data.steps.length){
+    stepsPanel.classList.add('open');
+    stepsList.innerHTML=data.steps.map((s,i)=>{
+      const files=(s.files||[]).map(f=>`<span class="step-file">${f}</span>`).join('');
+      return `<div class="step-item" onclick="clStepClick(${i})"><div class="step-num">STEP ${s.number||i+1}</div><div class="step-title">${s.title}</div><div class="step-desc">${s.description}</div><div class="step-files">${files}</div></div>`;
+    }).join('');
+  }
+  if(data.name){document.getElementById('clStatus').textContent='Project: '+data.name+' ('+data.files.length+' files)'}
+}
+
+function clStepClick(idx){
+  if(!clProjectData||!clProjectData.steps||!clProjectData.steps[idx])return;
+  const step=clProjectData.steps[idx];
+  if(step.files&&step.files.length){
+    const fileIdx=clProjectData.files.findIndex(f=>f.path===step.files[0]);
+    if(fileIdx>=0)clSelectFile(fileIdx);
+  }
+  document.querySelectorAll('.step-item').forEach((s,i)=>s.classList.toggle('active',i===idx));
+}
 
 async function clGenerate(){
   const prompt=document.getElementById('clPrompt').value.trim();
   if(!prompt||clGenerating)return;
   const lang=document.getElementById('clLang').value;
+  const framework=document.getElementById('clFramework').value;
   const btn=document.getElementById('clGenBtn');
   const editor=document.getElementById('clEditor');
   const status=document.getElementById('clStatus');
   clGenerating=true;btn.classList.add('loading');btn.disabled=true;
-  editor.value='';status.textContent='Generating...';
-  try{
-    const resp=await fetch(API+'/api/code/generate',{method:'POST',headers:H(),body:JSON.stringify({prompt,language:lang})});
-    const reader=resp.body.getReader();const dec=new TextDecoder();let full='';let buf='';
-    while(true){const{done,value}=await reader.read();if(done)break;buf+=dec.decode(value,{stream:true});const lines=buf.split('\n');buf=lines.pop();for(const line of lines){if(!line.startsWith('data: '))continue;try{const d=JSON.parse(line.slice(6));if(d.error){editor.value='Error: '+d.error;continue}if(d.token){full+=d.token;const cleaned=full.replace(/```[\w]*\n?/g,'').replace(/```$/g,'').trim();editor.value=cleaned}}catch{}}}
-    const detected=clDetectLang(editor.value);
-    document.getElementById('clLangLabel').textContent=detected;
-    status.textContent='Generated '+detected.toUpperCase();
-  }catch(e){editor.value='Error: '+e.message;status.textContent='Error'}
+  editor.value='';status.textContent=clMode==='project'?'Building project...':'Generating...';
+
+  if(clMode==='single'){
+    try{
+      const resp=await fetch(API+'/api/code/generate',{method:'POST',headers:H(),body:JSON.stringify({prompt,language:lang})});
+      const reader=resp.body.getReader();const dec=new TextDecoder();let full='';let buf='';
+      while(true){const{done,value}=await reader.read();if(done)break;buf+=dec.decode(value,{stream:true});const lines=buf.split('\n');buf=lines.pop();for(const line of lines){if(!line.startsWith('data: '))continue;try{const d=JSON.parse(line.slice(6));if(d.error){editor.value='Error: '+d.error;continue}if(d.token){full+=d.token;const cleaned=full.replace(/```[\w]*\n?/g,'').replace(/```$/g,'').trim();editor.value=cleaned}}catch{}}}
+      const detected=clDetectLang(editor.value);
+      document.getElementById('clLangLabel').textContent=detected;
+      status.textContent='Generated '+detected.toUpperCase();
+    }catch(e){editor.value='Error: '+e.message;status.textContent='Error'}
+  }else{
+    try{
+      const resp=await fetch(API+'/api/project/build',{method:'POST',headers:H(),body:JSON.stringify({description:prompt,language:lang,framework})});
+      const reader=resp.body.getReader();const dec=new TextDecoder();let full='';let buf='';
+      while(true){const{done,value}=await reader.read();if(done)break;buf+=dec.decode(value,{stream:true});const lines=buf.split('\n');buf=lines.pop();for(const line of lines){if(!line.startsWith('data: '))continue;try{const d=JSON.parse(line.slice(6));if(d.error){editor.value='Error: '+d.error;continue}if(d.token)full+=d.token}catch{}}}
+      const jsonMatch=full.match(/```json\s*([\s\S]*?)```/);
+      const jsonStr=jsonMatch?jsonMatch[1]:full.substring(full.indexOf('{'),full.lastIndexOf('}')+1);
+      try{
+        const data=JSON.parse(jsonStr);
+        clRenderProject(data);
+        if(data.files&&data.files.length>0){editor.value=data.files[0].content;document.getElementById('clLangLabel').textContent=data.files[0].path}
+        status.textContent='Project: '+(data.name||'Built')+' - '+data.files.length+' files';
+      }catch(pe){editor.value=full.replace(/```[\w]*\n?/g,'').replace(/```$/g,'').trim();status.textContent='Generated (parse error)'}
+    }catch(e){editor.value='Error: '+e.message;status.textContent='Error'}
+  }
   clGenerating=false;btn.classList.remove('loading');btn.disabled=false;
+}
+
+async function clExplain(){
+  const code=document.getElementById('clEditor').value.trim();
+  if(!code){toast('No code to explain');return}
+  const panel=document.getElementById('clExplainPanel');
+  document.querySelectorAll('.cl-tabs button')[2].click();
+  panel.innerHTML='<span style="color:#888">Analyzing code...</span>';
+  try{
+    const resp=await fetch(API+'/api/code/explain',{method:'POST',headers:H(),body:JSON.stringify({code,language:clDetectLang(code)})});
+    const reader=resp.body.getReader();const dec=new TextDecoder();let full='';let buf='';
+    while(true){const{done,value}=await reader.read();if(done)break;buf+=dec.decode(value,{stream:true});const lines=buf.split('\n');buf=lines.pop();for(const line of lines){if(!line.startsWith('data: '))continue;try{const d=JSON.parse(line.slice(6));if(d.error){panel.innerHTML='<span style="color:#ef4444">Error: '+d.error+'</span>';continue}if(d.token){full+=d.token;panel.innerHTML=marked.parse(full)}}catch{}}}
+    if(!full.trim())panel.innerHTML='<span style="color:#888">No explanation generated</span>';
+  }catch(e){panel.innerHTML='<span style="color:#ef4444">Error: '+e.message+'</span>'}
 }
 
 function clRun(){
