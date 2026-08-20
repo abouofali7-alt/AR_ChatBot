@@ -116,7 +116,7 @@ async function callGemini(messages, systemPrompt, apiKey, model, temperature) {
       systemInstruction: { parts: [{ text: systemPrompt }] },
       generationConfig: {
         temperature: temperature || 0.7,
-        maxOutputTokens: 8192,
+        maxOutputTokens: 16384,
       },
     }),
   });
